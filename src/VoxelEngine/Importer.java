@@ -21,15 +21,15 @@ public class Importer {
         for(File file : mcaFiles) {
 
             System.out.println(file.getAbsolutePath());
-            try {
-                NBTInputStream inputStream = new NBTInputStream(new FileInputStream(file), false);
-                Tag tag = inputStream.readTag();
-                System.out.println(tag.getName());
-            } catch (IOException e) {
-                // should never happen, we got the file out of the directory
-                // if it does happen, it's because the file has been deleted after reading it for the first time
-                e.printStackTrace();
-            }
+//            try {
+//                NBTInputStream inputStream = new NBTInputStream(new FileInputStream(file), false);
+//                Tag tag = inputStream.readTag();
+//                System.out.println(tag.getName());
+//            } catch (IOException e) {
+//                // should never happen, we got the file out of the directory
+//                // if it does happen, it's because the file has been deleted after reading it for the first time
+//                e.printStackTrace();
+//            }
 
             // TODO remove me
             break;
