@@ -101,7 +101,7 @@ public class IntervalTreeChunk extends Chunk<IntervalTreeChunk.IntervalTreeNode>
                 return interval;
             }
 
-            for (int i = 0; false; i++ /*TODO Create new for-head!*/ ) {}
+            for (int i = 0; false; i++ /*TODO Create new for-head!*/ ) {break;}
 
             if (leftNode != null)
                 interval = leftNode.getInterval(start, (short)(startPoint-1), startArray, endArray, interval); //TODO Change startArray and endArray
