@@ -137,14 +137,15 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
 
         Block[][][] chunkBlocks = chunk.getEntireChunk();
 
+        float blockSize = Chunk.GRID_SIZE / 1000;  // convert to meters
+        float halfBlockSize = blockSize / 2f;
+
         for(short x = 0; x < Chunk.CHUNK_SIZE; x++)
             for(short y = 0; y < Chunk.CHUNK_SIZE; y++)
                 for(short z = 0; z < Chunk.CHUNK_SIZE; z++) {
 
                     Block current = chunkBlocks[x][y][z];
                     if(current.isEmtpy()) continue;
-
-                    float blockSize = Chunk.GRID_SIZE / 1000;  // convert to meters
 
                     gl.glPushMatrix();
 
@@ -162,40 +163,40 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
                     gl.glBegin(GL_QUADS);
 
                     // Front Face
-                    gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-(blockSize / 2f), -(blockSize / 2f), (blockSize / 2f));
-                    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f( (blockSize / 2f), -(blockSize / 2f), (blockSize / 2f));
-                    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f( (blockSize / 2f), (blockSize / 2f), (blockSize / 2f));
-                    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(-(blockSize / 2f), (blockSize / 2f), (blockSize / 2f));
+                    gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-halfBlockSize, -halfBlockSize, halfBlockSize);
+                    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f( halfBlockSize, -halfBlockSize, halfBlockSize);
+                    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f( halfBlockSize, halfBlockSize, halfBlockSize);
+                    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(-halfBlockSize, halfBlockSize, halfBlockSize);
 
                     // Back Face
-                    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(-(blockSize / 2f), -(blockSize / 2f), -(blockSize / 2f));
-                    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(-(blockSize / 2f), (blockSize / 2f), -(blockSize / 2f));
-                    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f( (blockSize / 2f), (blockSize / 2f), -(blockSize / 2f));
-                    gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f( (blockSize / 2f), -(blockSize / 2f), -(blockSize / 2f));
+                    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(-halfBlockSize, -halfBlockSize, -halfBlockSize);
+                    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(-halfBlockSize, halfBlockSize, -halfBlockSize);
+                    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f( halfBlockSize, halfBlockSize, -halfBlockSize);
+                    gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f( halfBlockSize, -halfBlockSize, -halfBlockSize);
 
                     // Top Face
-                    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(-(blockSize / 2f), (blockSize / 2f), -(blockSize / 2f));
-                    gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-(blockSize / 2f), (blockSize / 2f), (blockSize / 2f));
-                    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f( (blockSize / 2f), (blockSize / 2f), (blockSize / 2f));
-                    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f( (blockSize / 2f), (blockSize / 2f), -(blockSize / 2f));
+                    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(-halfBlockSize, halfBlockSize, -halfBlockSize);
+                    gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-halfBlockSize, halfBlockSize, halfBlockSize);
+                    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f( halfBlockSize, halfBlockSize, halfBlockSize);
+                    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f( halfBlockSize, halfBlockSize, -halfBlockSize);
 
                     // Bottom Face
-                    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(-(blockSize / 2f), -(blockSize / 2f), -(blockSize / 2f));
-                    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f( (blockSize / 2f), -(blockSize / 2f), -(blockSize / 2f));
-                    gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f( (blockSize / 2f), -(blockSize / 2f), (blockSize / 2f));
-                    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(-(blockSize / 2f), -(blockSize / 2f), (blockSize / 2f));
+                    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(-halfBlockSize, -halfBlockSize, -halfBlockSize);
+                    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f( halfBlockSize, -halfBlockSize, -halfBlockSize);
+                    gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f( halfBlockSize, -halfBlockSize, halfBlockSize);
+                    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(-halfBlockSize, -halfBlockSize, halfBlockSize);
 
                     // Right face
-                    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f( (blockSize / 2f), -(blockSize / 2f), -(blockSize / 2f));
-                    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f( (blockSize / 2f), (blockSize / 2f), -(blockSize / 2f));
-                    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f( (blockSize / 2f), (blockSize / 2f), (blockSize / 2f));
-                    gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f( (blockSize / 2f), -(blockSize / 2f), (blockSize / 2f));
+                    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f( halfBlockSize, -halfBlockSize, -halfBlockSize);
+                    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f( halfBlockSize, halfBlockSize, -halfBlockSize);
+                    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f( halfBlockSize, halfBlockSize, halfBlockSize);
+                    gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f( halfBlockSize, -halfBlockSize, halfBlockSize);
 
                     // Left Face
-                    gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-(blockSize / 2f), -(blockSize / 2f), -(blockSize / 2f));
-                    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(-(blockSize / 2f), -(blockSize / 2f), (blockSize / 2f));
-                    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(-(blockSize / 2f), (blockSize / 2f), (blockSize / 2f));
-                    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(-(blockSize / 2f), (blockSize / 2f), -(blockSize / 2f));
+                    gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-halfBlockSize, -halfBlockSize, -halfBlockSize);
+                    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(-halfBlockSize, -halfBlockSize, halfBlockSize);
+                    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(-halfBlockSize, halfBlockSize, halfBlockSize);
+                    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(-halfBlockSize, halfBlockSize, -halfBlockSize);
 
                     gl.glEnd();
 
