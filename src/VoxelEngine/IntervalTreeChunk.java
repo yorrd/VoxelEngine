@@ -33,11 +33,10 @@ public class IntervalTreeChunk extends Chunk<IntervalTreeChunk.IntervalTreeNode>
     Block[][][] getInterval(short x1, short x2, short y1, short y2, short z1, short z2) {
         Block[][][] interval = new Block[y2-y1][z2-z1][x2-x1];
         short tmp;
-        Block[] intervalPart;
         for (short y = 0; y < y2-y1; y++) {
             for (short z = 0; z < z2-z1; z++) {
                 tmp = (short) (CHUNK_SIZE*(z* Chunk.CHUNK_SIZE + y));
-                Block[] result = intervalTree.getInterval((short)(tmp + x1), (short)(tmp + x2), new Block[x2 - x1]);
+                Block[] result = intervalTree.getInterval((short)(tmp + x1), (short)(tmp + x2), (short) 0, (short)(x2-x1-1), new Block[x2 - x1]);
                 interval[y][z] = result;
             }
         }
@@ -93,20 +92,24 @@ public class IntervalTreeChunk extends Chunk<IntervalTreeChunk.IntervalTreeNode>
                 return leftNode.getBlock(x, y, z);
         }
 
-        private Block[] getInterval (short start, short end, Block[] interval) {
+        private Block[] getInterval (short start, short end, short startArray, short endArray, Block[] interval) {
 
-            if (end <= start)
+            if (end < start)
                 return interval;
 
-            for (int i = ((startPoint - start < 0)? 0 : startPoint - start); i < interval.length; i++) {
+            if (end == start) {
+                return interval;
+            }
+
+            for (int i = 0; false; i++ /*TODO Create new for-head!*/ ) {
                 interval[i] = block;
             }
 
             if (leftNode != null)
-                interval = leftNode.getInterval(start, (short)(startPoint-1), interval);
+                interval = leftNode.getInterval(start, (short)(startPoint-1), startArray, endArray, interval); //TODO Change startArray and endArray
 
             if (rightNode != null)
-                interval = rightNode.getInterval((short)(endPoint+1), end, interval);
+                interval = rightNode.getInterval((short)(endPoint+1), end, startArray, endArray, interval); //TODO Change startArray and endArray
 
             return interval;
         }
