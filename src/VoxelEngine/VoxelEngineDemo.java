@@ -19,7 +19,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 
 public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
 
@@ -119,17 +118,23 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
         gl.glLoadIdentity();
         glu.gluLookAt(x, cameraDistance / 2, z, 0f, 1f, 0f, 0f, 1f, 0f);
 
-        drawCubes(gl);
+        Chunk[][] chunks = world.getVisibleChunks();
+
+        for(int x = 0; x < chunks.length; x++) {
+            for(int y = 0; y < chunks[0].length; y++) {
+                int chunkX = x - chunks.length / 2;
+                int chunkY = y - chunks[0].length / 2;
+                drawChunk(gl, chunks[x][y], chunkX, chunkY);
+            }
+        }
 
         cameraAngle += .01;
         x = cameraDistance * (float) Math.sin(cameraAngle);
         z = -1f * cameraDistance * (float) Math.cos(cameraAngle);
     }
 
-    private void drawCubes(GL2 gl) {
-        // TODO align chunks
+    private void drawChunk(GL2 gl, Chunk chunk, int chunkX, int chunkY) {
 
-        Chunk chunk = world.getVisibleChunks()[0];
         Block[][][] chunkBlocks = chunk.getEntireChunk();
 
         for(short x = 0; x < Chunk.CHUNK_SIZE; x++)
@@ -144,9 +149,9 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
                     gl.glPushMatrix();
 
                     gl.glTranslatef(
-                            x * blockSize + blockSize / 2f,
-                            z * blockSize + blockSize / 2f,
-                            y * blockSize + blockSize / 2f);
+                            x + chunkX * Chunk.CHUNK_SIZE * blockSize + blockSize / 2f,
+                            z                             * blockSize + blockSize / 2f,
+                            y + chunkY * Chunk.CHUNK_SIZE * blockSize + blockSize / 2f);
 
                     // draw cube
                     gl.glEnable(GL_TEXTURE_2D);

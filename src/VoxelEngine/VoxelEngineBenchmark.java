@@ -6,7 +6,7 @@ import java.util.Scanner;
 
 public class VoxelEngineBenchmark {
 
-    public static final int ITERATIONS = 10;  // quite good sample size
+    public static final int ITERATIONS = 100;  // quite good sample size
 
     HashMap<ChunkOptions, Long[]> benchmarks = new HashMap<>();
     long measurementOverhead = nanoTimeCalibration();
