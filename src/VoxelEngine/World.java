@@ -2,20 +2,28 @@ package VoxelEngine;
 
 public class World {
 
-    Chunk oneTestChunk;
+    public static final int VIEW_DISTANCE = 17;
+
+    Chunk[][] chunksInRange = new Chunk[VIEW_DISTANCE][VIEW_DISTANCE];
     TerrainGenerator generator;
 
     World() {
         generator = new SimplexTerrainGenerator(0L);
-        createNewChunk(0, 0, 0);
+
+        // TODO z is always 0, there are no 3d chunks yet
+
+        for(int x = 0; x < VIEW_DISTANCE; x++) {
+            for(int y = 0; y < VIEW_DISTANCE; y++) {
+                createNewChunk(x, y, 0);
+            }
+        }
     }
 
     public void createNewChunk(int x, int y, int z) {
-        // TODO actually do this for the chunked asked for
-        oneTestChunk = new IntervalTreeChunk(generator.getGeneratorForChunk(x, y, z));
+        chunksInRange[x][y] = new ArrayChunk(generator.getGeneratorForChunk(x, y, z));
     }
 
-    Chunk[] getVisibleChunks() {
-        return new Chunk[]{oneTestChunk};
+    Chunk[][] getVisibleChunks() {
+        return chunksInRange;
     }
 }
