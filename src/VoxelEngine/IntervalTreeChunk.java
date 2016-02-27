@@ -9,7 +9,7 @@ public class IntervalTreeChunk extends Chunk<IntervalTreeChunk.IntervalTreeNode>
         super(generator);
     }
 
-    void initializeWorld(TerrainGenerator generator) {
+    void initializeChunk(TerrainGenerator generator) {
         intervalTree = new IntervalTreeNode(new Block(Block.EMPTY), (short)0, (short)(CHUNK_VOLUME - 1));
         for (short x = 0; x < CHUNK_SIZE; x++) {
             for (short y = 0; y < CHUNK_SIZE; y++) {

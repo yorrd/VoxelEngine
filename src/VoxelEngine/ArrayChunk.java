@@ -1,7 +1,5 @@
 package VoxelEngine;
 
-import java.util.Arrays;
-
 public class ArrayChunk extends Chunk<Block[][][]> {
 
     ArrayChunk(TerrainGenerator generator) {
@@ -9,7 +7,7 @@ public class ArrayChunk extends Chunk<Block[][][]> {
     }
 
     @Override
-    void initializeWorld(TerrainGenerator generator) {
+    void initializeChunk(TerrainGenerator generator) {
         chunkmap = new Block[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE];
         for(int x = 0; x < CHUNK_SIZE; x++)
             for(int y = 0; y < CHUNK_SIZE; y++) {
@@ -41,33 +39,6 @@ public class ArrayChunk extends Chunk<Block[][][]> {
             }
         }
         return returnArray;
-    }
-
-    Block[] get(int x, int y) {
-        return chunkmap[x][y];
-    }
-
-    void moveDown() {
-        for(int x = 0; x < CHUNK_SIZE; x++)
-            for(int y = 0; y < CHUNK_SIZE; y++) {
-                Block[] column = get(x, y);
-                Arrays.sort(column, (o1, o2) -> {
-                    if(o1.isEmtpy())
-                        return o2.isEmtpy() ? 0 : 1;
-                    else
-                        return o2.isEmtpy() ? 0 : -1;
-                });
-            }
-    }
-
-    void showCoordinateBlocks() {
-        for(int x = 0; x < CHUNK_SIZE; x++)
-            for(int y = 0; y < CHUNK_SIZE; y++) {
-                for(int z = 0; z < CHUNK_SIZE; z++) {
-                    if(x == 0 || y == 0 || z == 0)
-                        set(x, y, z, new Block(2));
-                }
-            }
     }
 
     public String toString() {

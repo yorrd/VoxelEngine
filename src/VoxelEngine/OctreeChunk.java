@@ -9,7 +9,7 @@ public class OctreeChunk extends Chunk<OctreeChunk.OctreeNode[]> {
     }
 
     @Override
-    void initializeWorld(TerrainGenerator generator) {
+    void initializeChunk(TerrainGenerator generator) {
         chunkmap = new OctreeNode[8];
         // TODO actually listen to the generator
         for(int eight = 0; eight < 8; eight++) {

@@ -24,18 +24,37 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
 
     public static String TITLE = "VoxelEngine Simple Demo";
     private static final int FPS = 60;
+    protected JFrame frame;
 
-    private static World world;
+    protected static World world;
 
     public static void main(String[] args) {
         new VoxelEngineDemo();
-        SwingUtilities.invokeLater(() -> {
-            GLCanvas canvas = new VoxelEngineDemo();
-            canvas.setPreferredSize(new Dimension(1024, 720));
-            JFrame frame = new JFrame();
-            frame.getContentPane().add(canvas);
+    }
 
-            FPSAnimator animator = new FPSAnimator(canvas, FPS);
+
+    private GLU glu;  // for the GL Utility
+
+    // cameraAngle of rotation for the camera direction
+    float cameraAngle =0.0f;
+    // XZ position of the camera
+    float x=0.0f, z=5.0f;
+    float cameraDistance = 25f;
+
+    private int[] textures = new int[Block.NUMBER_MATERIALS];
+
+    VoxelEngineDemo() {
+
+        this.addGLEventListener(this);  // this class also serves as the renderer
+        this.addKeyListener(new VoxelEngineKeyListener());
+        world = new World();
+
+        SwingUtilities.invokeLater(() -> {
+            VoxelEngineDemo.this.setPreferredSize(new Dimension(1024, 720));
+            frame = new JFrame();
+            frame.getContentPane().add(VoxelEngineDemo.this);
+
+            FPSAnimator animator = new FPSAnimator(VoxelEngineDemo.this, FPS, false);
 
             frame.addWindowListener(new WindowAdapter() {
                 @Override
@@ -54,23 +73,6 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
             frame.setVisible(true);
             animator.start();
         });
-    }
-
-
-    private GLU glu;  // for the GL Utility
-
-    // cameraAngle of rotation for the camera direction
-    float cameraAngle =0.0f;
-    // XZ position of the camera
-    float x=0.0f, z=5.0f;
-    float cameraDistance = 25f;
-
-    private int[] textures = new int[Block.NUMBER_MATERIALS];
-
-    VoxelEngineDemo() {
-        this.addGLEventListener(this);  // this class also serves as the renderer
-        this.addKeyListener(new VoxelEngineKeyListener());
-        world = new World();
     }
 
     @Override
@@ -112,7 +114,6 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
 
     @Override
     public void display(GLAutoDrawable drawable) {
-        // TODO rotating around something close to the center, not the center. no idea why yet
         GL2 gl = drawable.getGL().getGL2();  // get the OpenGL 2 graphics context
         gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         gl.glLoadIdentity();
@@ -133,7 +134,7 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
         z = -1f * cameraDistance * (float) Math.cos(cameraAngle);
     }
 
-    private void drawChunk(GL2 gl, Chunk chunk, int chunkX, int chunkY) {
+    protected void drawChunk(GL2 gl, Chunk chunk, int chunkX, int chunkY) {
 
         Block[][][] chunkBlocks = chunk.getEntireChunk();
 

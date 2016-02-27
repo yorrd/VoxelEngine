@@ -3,7 +3,7 @@ package VoxelEngine;
 public class World {
 
     // TODO make centered, not absolute
-    public static final int VIEW_DISTANCE = 4;
+    public static final int VIEW_DISTANCE = 8;
 
     Chunk[][] chunksInRange = new Chunk[VIEW_DISTANCE][VIEW_DISTANCE];
     TerrainGenerator generator;
@@ -26,5 +26,9 @@ public class World {
 
     Chunk[][] getVisibleChunks() {
         return chunksInRange;
+    }
+
+    Chunk getChunk(int x, int y, int z) {
+        return chunksInRange[x][y];
     }
 }
