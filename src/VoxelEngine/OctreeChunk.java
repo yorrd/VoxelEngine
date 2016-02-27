@@ -13,7 +13,7 @@ public class OctreeChunk extends Chunk<OctreeChunk.OctreeNode[]> {
         chunkmap = new OctreeNode[8];
         // TODO actually listen to the generator
         for(int eight = 0; eight < 8; eight++) {
-            chunkmap[eight] = new OctreeNode(new Block(Block.EMPTY));
+            chunkmap[eight] = new OctreeNode(new Block(Block.BlockType.EMPTY));
         }
     }
 
@@ -29,7 +29,7 @@ public class OctreeChunk extends Chunk<OctreeChunk.OctreeNode[]> {
     }
 
     @Override
-    void set(int x, int y, int z, Block block) {
+    void set(short x, short y, short z, Block block) {
         search(x, y, z).setBlock(block);
     }
 
@@ -92,7 +92,7 @@ public class OctreeChunk extends Chunk<OctreeChunk.OctreeNode[]> {
 //        }
 //
 //        return currentNode;
-        return new OctreeNode(new Block(Block.EMPTY));
+        return new OctreeNode(new Block(Block.BlockType.EMPTY));
     }
 
     void moveDown() {

@@ -9,16 +9,26 @@ public class ArrayChunk extends Chunk<Block[][][]> {
     @Override
     void initializeChunk(TerrainGenerator generator) {
         chunkmap = new Block[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE];
-        for(int x = 0; x < CHUNK_SIZE; x++)
-            for(int y = 0; y < CHUNK_SIZE; y++) {
-                for (int z = 0; z < CHUNK_SIZE; z++) {
+        for (short x = 0; x < CHUNK_SIZE; x++) {
+            for (short y = 0; y < CHUNK_SIZE; y++) {
+                for (short z = 0; z < CHUNK_SIZE; z++) {
                     set(x, y, z, generator.getBlock(x, y, z));
                 }
             }
+        }
+
+        // TODO make this more efficient
+        for (short x = 0; x < CHUNK_SIZE; x++) {
+            for (short y = 0; y < CHUNK_SIZE; y++) {
+                for (short z = 0; z < CHUNK_SIZE; z++) {
+                    triggerBlockUpdate(x, y, z);
+                }
+            }
+        }
     }
 
     @Override
-    void set(int x, int y, int z, Block block) {
+    void set(short x, short y, short z, Block block) {
         chunkmap[x][y][z] = block;
     }
 

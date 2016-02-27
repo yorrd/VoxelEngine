@@ -41,7 +41,7 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
     float x=0.0f, z=5.0f;
     float cameraDistance = 25f;
 
-    private int[] textures = new int[Block.NUMBER_MATERIALS];
+    private int[] textures = new int[512];
 
     VoxelEngineDemo() {
 
@@ -146,7 +146,7 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
                 for(short z = 0; z < Chunk.CHUNK_SIZE; z++) {
 
                     Block current = chunkBlocks[x][y][z];
-                    if(current.isEmtpy()) continue;
+                    if(current.isEmtpy() || current.isHidden()) continue;
 
                     gl.glPushMatrix();
 
@@ -159,45 +159,59 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
                     gl.glEnable(GL_TEXTURE_2D);
                     gl.glEnable(GL_BLEND);
                     gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-                    gl.glBindTexture(GL_TEXTURE_2D, textures[current.getType()]);
+                    gl.glBindTexture(GL_TEXTURE_2D, textures[current.getType().ID]);
                     gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
                     gl.glBegin(GL_QUADS);
 
+                    // TODO some sides should be rendered but aren't. Not sure which ones
+
                     // Front Face
-                    gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-halfBlockSize, -halfBlockSize, halfBlockSize);
-                    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f( halfBlockSize, -halfBlockSize, halfBlockSize);
-                    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f( halfBlockSize, halfBlockSize, halfBlockSize);
-                    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(-halfBlockSize, halfBlockSize, halfBlockSize);
+                    if (!current.isHidden(Block.FRONT)) {
+                        gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-halfBlockSize, -halfBlockSize, halfBlockSize);
+                        gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f( halfBlockSize, -halfBlockSize, halfBlockSize);
+                        gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f( halfBlockSize, halfBlockSize, halfBlockSize);
+                        gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(-halfBlockSize, halfBlockSize, halfBlockSize);
+                    }
 
                     // Back Face
-                    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(-halfBlockSize, -halfBlockSize, -halfBlockSize);
-                    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(-halfBlockSize, halfBlockSize, -halfBlockSize);
-                    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f( halfBlockSize, halfBlockSize, -halfBlockSize);
-                    gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f( halfBlockSize, -halfBlockSize, -halfBlockSize);
+                    if (!current.isHidden(Block.BACK)) {
+                        gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(-halfBlockSize, -halfBlockSize, -halfBlockSize);
+                        gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(-halfBlockSize, halfBlockSize, -halfBlockSize);
+                        gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f( halfBlockSize, halfBlockSize, -halfBlockSize);
+                        gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f( halfBlockSize, -halfBlockSize, -halfBlockSize);
+                    }
 
                     // Top Face
-                    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(-halfBlockSize, halfBlockSize, -halfBlockSize);
-                    gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-halfBlockSize, halfBlockSize, halfBlockSize);
-                    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f( halfBlockSize, halfBlockSize, halfBlockSize);
-                    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f( halfBlockSize, halfBlockSize, -halfBlockSize);
+                    if (!current.isHidden(Block.TOP)) {
+                        gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(-halfBlockSize, halfBlockSize, -halfBlockSize);
+                        gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-halfBlockSize, halfBlockSize, halfBlockSize);
+                        gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f( halfBlockSize, halfBlockSize, halfBlockSize);
+                        gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f( halfBlockSize, halfBlockSize, -halfBlockSize);
+                    }
 
                     // Bottom Face
-                    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(-halfBlockSize, -halfBlockSize, -halfBlockSize);
-                    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f( halfBlockSize, -halfBlockSize, -halfBlockSize);
-                    gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f( halfBlockSize, -halfBlockSize, halfBlockSize);
-                    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(-halfBlockSize, -halfBlockSize, halfBlockSize);
+                    if (!current.isHidden(Block.BOTTOM)) {
+                        gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(-halfBlockSize, -halfBlockSize, -halfBlockSize);
+                        gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f( halfBlockSize, -halfBlockSize, -halfBlockSize);
+                        gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f( halfBlockSize, -halfBlockSize, halfBlockSize);
+                        gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(-halfBlockSize, -halfBlockSize, halfBlockSize);
+                    }
 
                     // Right face
-                    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f( halfBlockSize, -halfBlockSize, -halfBlockSize);
-                    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f( halfBlockSize, halfBlockSize, -halfBlockSize);
-                    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f( halfBlockSize, halfBlockSize, halfBlockSize);
-                    gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f( halfBlockSize, -halfBlockSize, halfBlockSize);
+                    if (!current.isHidden(Block.RIGHT)) {
+                        gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f( halfBlockSize, -halfBlockSize, -halfBlockSize);
+                        gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f( halfBlockSize, halfBlockSize, -halfBlockSize);
+                        gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f( halfBlockSize, halfBlockSize, halfBlockSize);
+                        gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f( halfBlockSize, -halfBlockSize, halfBlockSize);
+                    }
 
                     // Left Face
-                    gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-halfBlockSize, -halfBlockSize, -halfBlockSize);
-                    gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(-halfBlockSize, -halfBlockSize, halfBlockSize);
-                    gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(-halfBlockSize, halfBlockSize, halfBlockSize);
-                    gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(-halfBlockSize, halfBlockSize, -halfBlockSize);
+                    if (!current.isHidden(Block.LEFT)) {
+                        gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-halfBlockSize, -halfBlockSize, -halfBlockSize);
+                        gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(-halfBlockSize, -halfBlockSize, halfBlockSize);
+                        gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(-halfBlockSize, halfBlockSize, halfBlockSize);
+                        gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(-halfBlockSize, halfBlockSize, -halfBlockSize);
+                    }
 
                     gl.glEnd();
 

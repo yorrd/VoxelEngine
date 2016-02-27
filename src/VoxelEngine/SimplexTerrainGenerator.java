@@ -27,12 +27,12 @@ public class SimplexTerrainGenerator extends TerrainGenerator {
         int max = 10;
         int layerHeight = 2;
 
-        int material = Block.EMPTY;
+        Block.BlockType material = Block.BlockType.EMPTY;
 
         if(noise.eval(x, y) * (Chunk.CHUNK_SIZE - (min + max)) + min > z)
-            material = 0;
+            material = Block.BlockType.STONE;
         else if(noise.eval(x, y) * (Chunk.CHUNK_SIZE - (min + max)) + min + layerHeight > z)
-            material = 1;
+            material = Block.BlockType.GRASS;
 
         return new Block(material);
     }

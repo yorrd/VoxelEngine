@@ -14,7 +14,7 @@ public abstract class Chunk<T> {
 
     abstract void initializeChunk(TerrainGenerator generator);
 
-    abstract void set(int x, int y, int z, Block block);
+    abstract void set(short x, short y, short z, Block block);
 
     abstract Block get(short x, short y, short z);
 
@@ -22,6 +22,59 @@ public abstract class Chunk<T> {
 
     Block[][][] getEntireChunk() {
         return getInterval((short) 0, CHUNK_SIZE, (short) 0, CHUNK_SIZE, (short) 0, CHUNK_SIZE);
+    }
+
+    void triggerBlockUpdate(short x, short y, short z) {
+
+        Block changedBlock = get(x, y, z);
+
+        if(z + 1 < CHUNK_SIZE) {
+            Block top = get(x, y, ((short) (z + 1)));
+            if (top != null)
+                top.blockUpdate(Block.BOTTOM, changedBlock);
+        } else {
+            // TODO chunk edge
+        }
+
+        if(y + 1 < CHUNK_SIZE) {
+            Block back = get(x, ((short) (y + 1)), z);
+            if (back != null)
+                back.blockUpdate(Block.FRONT, changedBlock);
+        } else {
+            // TODO chunk edge
+        }
+
+        if(x + 1 < CHUNK_SIZE) {
+            Block right = get(((short) (x + 1)), y, z);
+            if (right != null)
+                right.blockUpdate(Block.LEFT, changedBlock);
+        } else {
+            // TODO chunk edge
+        }
+
+        if(y - 1 > 0) {
+            Block front = get(x, ((short) (y - 1)), z);
+            if (front != null)
+                front.blockUpdate(Block.BACK, changedBlock);
+        } else {
+            // TODO chunk edge
+        }
+
+        if(x - 1 > 0) {
+            Block left = get(((short) (x - 1)), y, z);
+            if (left != null)
+                left.blockUpdate(Block.RIGHT, changedBlock);
+        } else {
+            // TODO chunk edge
+        }
+
+        if(z - 1 > 0) {
+            Block bottom = get(x, y, ((short) (z - 1)));
+            if (bottom != null)
+                bottom.blockUpdate(Block.TOP, changedBlock);
+        } else {
+            // TODO chunk edge
+        }
     }
 
     abstract public String toString();

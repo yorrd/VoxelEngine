@@ -4,7 +4,7 @@ public class ChaosTerrainGenerator extends TerrainGenerator {
 
     @Override
     protected Block createBlock(int x, int y, int z) {
-        return new Block((int) (Math.random() * 3));
+        return new Block(Block.BlockType.getRandom());
     }
 
     @Override

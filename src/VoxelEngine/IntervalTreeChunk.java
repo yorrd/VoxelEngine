@@ -10,7 +10,7 @@ public class IntervalTreeChunk extends Chunk<IntervalTreeChunk.IntervalTreeNode>
     }
 
     void initializeChunk(TerrainGenerator generator) {
-        intervalTree = new IntervalTreeNode(new Block(Block.EMPTY), (short)0, (short)(CHUNK_VOLUME - 1));
+        intervalTree = new IntervalTreeNode(new Block(Block.BlockType.EMPTY), (short)0, (short)(CHUNK_VOLUME - 1));
         for (short x = 0; x < CHUNK_SIZE; x++) {
             for (short y = 0; y < CHUNK_SIZE; y++) {
                 for (short z = 0; z < CHUNK_SIZE; z++) {
@@ -20,7 +20,7 @@ public class IntervalTreeChunk extends Chunk<IntervalTreeChunk.IntervalTreeNode>
         }
     }
 
-    void set(int x, int y, int z, Block block) {
+    void set(short x, short y, short z, Block block) {
         intervalTree.setBlock((byte)x, (byte)y, (byte)z, block);
     }
 
@@ -115,7 +115,7 @@ public class IntervalTreeChunk extends Chunk<IntervalTreeChunk.IntervalTreeNode>
         void setBlock(short x, short y, short z, Block block) {
 //            this.block = new Block(0);
 
-            int type = block.getType();
+            Block.BlockType type = block.getType();
             short onedimcoord = (short) (Chunk.CHUNK_SIZE * (z* Chunk.CHUNK_SIZE + y) + x);
 
             if (onedimcoord < endPoint && onedimcoord > startPoint){
