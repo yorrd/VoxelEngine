@@ -2,7 +2,7 @@ package VoxelEngine;
 
 public class World {
 
-    public static final int VIEW_DISTANCE = 4;
+    public static final int VIEW_DISTANCE = 2;
 
     Chunk[][] chunksInRange = new Chunk[VIEW_DISTANCE * 2 + 1][VIEW_DISTANCE * 2 + 1];
     TerrainGenerator generator;
@@ -10,7 +10,7 @@ public class World {
     World() {
         generator = new SimplexTerrainGenerator(0L);
 
-        // TODO z is always 0, there are no 3d chunks yet
+        // TODO cameraY is always 0, there are no 3d chunks yet
 
         for(int x = -VIEW_DISTANCE; x <= VIEW_DISTANCE; x++) {
             for(int y = -VIEW_DISTANCE; y <= VIEW_DISTANCE; y++) {
@@ -28,7 +28,7 @@ public class World {
             getNeighbor(Block.LEFT, x, y, z),
             getNeighbor(Block.BOTTOM, x, y, z),
         };
-        Chunk newChunk = new ArrayChunk(generator.getGeneratorForChunk(x, y, z), neighbors);
+        Chunk newChunk = new IntervalTreeChunk(generator.getGeneratorForChunk(x, y, z), neighbors);
         setChunk(x, y, z, newChunk);
     }
 

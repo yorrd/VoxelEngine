@@ -34,64 +34,7 @@ public class OctreeChunk extends Chunk<OctreeChunk.OctreeNode[]> {
     }
 
     private OctreeNode search(int x, int y, int z) {
-//        // norm back to indices
-//        x += MAX_X;
-//        y += MAX_Y;
-//        z += MAX_Z;
-//
-//        // initialize values
-//        OctreeNode currentNode = new OctreeNode(chunkmap);
-//        int halfX = MAX_X * 2 + 1;
-//        int halfY = MAX_Y * 2 + 1;
-//        int halfZ = MAX_Z * 2 + 1;
-//
-//        // until we have found the end point where there are no more children
-//        while(currentNode.hasChildren()) {
-//            // part the possible space in halves in all directions (rounding up)
-//            halfX = (int) Math.ceil(halfX / 2);
-//            halfY = (int) Math.ceil(halfY / 2);
-//            halfZ = (int) Math.ceil(halfZ / 2);
-//
-//            // set vars to true if they are within the first interval
-//            boolean xRoute = x <= halfX;
-//            boolean yRoute = y <= halfY;
-//            boolean zRoute = z <= halfZ;
-//
-//            // evaluate which one we need
-//            int n;
-//            if(xRoute)
-//                if(yRoute)
-//                    if(zRoute)
-//                        n = 1;
-//                    else
-//                        n = 5;
-//                else
-//                    if(zRoute)
-//                        n = 3;
-//                    else
-//                        n = 7;
-//            else
-//                if(yRoute)
-//                    if(zRoute)
-//                        n = 2;
-//                    else
-//                        n = 6;
-//                else
-//                    if(zRoute)
-//                        n = 4;
-//                    else
-//                        n = 8;
-//
-//            // make n an index
-//            n -= 1;
-//
-//            if(n == -1)
-//                throw new IllegalStateException("The index can never be -1 here.");
-//
-//            currentNode = currentNode.getChild(n);
-//        }
-//
-//        return currentNode;
+        // TODO
         return new OctreeNode(new Block(Block.BlockType.EMPTY));
     }
 

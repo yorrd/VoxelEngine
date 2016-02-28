@@ -13,10 +13,7 @@ import static com.jogamp.opengl.GL2.*;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
 
@@ -35,17 +32,24 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
 
     private GLU glu;  // for the GL Utility
 
-    // cameraAngle of rotation for the camera direction
-    float cameraAngle =0.0f;
+    // cameraLeftRight of rotation for the camera direction
+    float cameraLeftRight = 0.0f, cameraUpDown = 0.0f;
     // XZ position of the camera
-    float x=0.0f, z=5.0f;
-    float cameraDistance = 25f;
+    float cameraX = 0.0f, cameraY = 5.0f, cameraZ = 0.0f;
+    float viewDistance = 25f;
+    float speed = .5f;
 
     private int[] textures = new int[512];
 
     VoxelEngineDemo() {
 
         this.addGLEventListener(this);  // this class also serves as the renderer
+        try {
+            this.addMouseMotionListener(new VoxelEngineMouseMotionListener());
+        } catch (AWTException e) {
+            // fail, whatever
+            System.out.println("failed to initialize mouse listener");
+        }
         this.addKeyListener(new VoxelEngineKeyListener());
         world = new World();
 
@@ -63,7 +67,9 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
                         @Override
                         public void run() {
                             if(animator.isStarted()) animator.stop();
-                            System.exit(0);
+                            VoxelEngineDemo.this.destroy();
+                            VoxelEngineDemo.this.frame.setVisible(false);
+                            VoxelEngineDemo.this.frame.dispose();
                         }
                     }.start();
                 }
@@ -117,7 +123,9 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
         GL2 gl = drawable.getGL().getGL2();  // get the OpenGL 2 graphics context
         gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         gl.glLoadIdentity();
-        glu.gluLookAt(x, cameraDistance / 2, z, 0f, 1f, 0f, 0f, 1f, 0f);
+        glu.gluLookAt(cameraX, cameraZ, cameraY,
+                      cameraX + viewDistance * (float) Math.sin(cameraLeftRight), cameraZ + viewDistance * (float) Math.sin(cameraUpDown), cameraY + -1 * viewDistance * (float) Math.cos(cameraLeftRight),
+                      0f, 1f, 0f);
 
         Chunk[][] chunks = world.getVisibleChunks();
 
@@ -128,10 +136,6 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
                 drawChunk(gl, chunks[x][y], chunkX, chunkY);
             }
         }
-
-        cameraAngle += .01;
-        x = cameraDistance * (float) Math.sin(cameraAngle);
-        z = -1f * cameraDistance * (float) Math.cos(cameraAngle);
     }
 
     protected void drawChunk(GL2 gl, Chunk chunk, int chunkX, int chunkY) {
@@ -224,7 +228,8 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
 
     }
 
-    static class VoxelEngineKeyListener implements KeyListener {
+
+    class VoxelEngineKeyListener implements KeyListener {
 
         @Override
         public void keyTyped(KeyEvent e) {
@@ -232,10 +237,56 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
 
         @Override
         public void keyPressed(KeyEvent e) {
+            switch (e.getKeyCode()) {
+                case KeyEvent.VK_D:
+                    cameraX += speed;
+                    break;
+                case KeyEvent.VK_A:
+                    cameraX -= speed;
+                    break;
+                case KeyEvent.VK_S:
+                    cameraY += speed;
+                    break;
+                case KeyEvent.VK_W:
+                    cameraY -= speed;
+                    break;
+                case KeyEvent.VK_SPACE:
+                    cameraZ += speed;
+                    break;
+                case KeyEvent.VK_SHIFT:
+                    cameraZ -= speed;
+                    break;
+            }
         }
 
         @Override
         public void keyReleased(KeyEvent e) {
+        }
+    }
+
+    class VoxelEngineMouseMotionListener implements MouseMotionListener {
+
+        private Robot robot;
+        private int oldX = 0;
+        private int oldY = 0;
+
+        VoxelEngineMouseMotionListener() throws AWTException {
+            robot = new Robot();
+        }
+
+        @Override
+        public void mouseDragged(MouseEvent e) {
+
+        }
+
+        @Override
+        public void mouseMoved(MouseEvent e) {
+            // TODO NEVER MOVE THE WINDOW or else...
+
+            cameraLeftRight += (e.getX() - oldX) / 100D;
+            cameraUpDown += (e.getY() - oldY) / 100D;
+            oldX = e.getX();
+            oldY = e.getY();
         }
     }
 }
