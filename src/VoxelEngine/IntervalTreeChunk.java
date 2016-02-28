@@ -98,16 +98,34 @@ public class IntervalTreeChunk extends Chunk<IntervalTreeChunk.IntervalTreeNode>
                 return interval;
 
             if (end == start) {
+                interval[startArray] = this.block;
                 return interval;
             }
 
-            for (int i = 0; true; i++ /*TODO Create new for-head!*/ ) {break;}
+            if (start > endPoint)
+                return rightNode.getInterval(start, end, startArray, endArray, interval);
 
-            if (leftNode != null)
-                interval = leftNode.getInterval(start, (short)(startPoint-1), startArray, endArray, interval); //TODO Change startArray and endArray
+            if (end < startPoint)
+                return leftNode.getInterval(start, end, startArray, endArray, interval);
 
-            if (rightNode != null)
-                interval = rightNode.getInterval((short)(endPoint+1), end, startArray, endArray, interval); //TODO Change startArray and endArray
+            if (start < startPoint) { //start of searched array left from current interval
+                for (int i = startArray; i < ((startPoint - start < endArray)? startPoint - start: endArray); i++)
+                    interval[i] = this.block;
+                if (leftNode != null)
+                    interval = leftNode.getInterval(start, (short)(startPoint - 1), startArray, (short)((startPoint - start < endArray)? startPoint - start: endArray), interval);
+            }
+
+            if (end > endPoint) { //end of searched array right from current interval
+                int cap = ((endPoint + 1 < endArray)? endPoint + 1 : endArray);
+                for (int i = startArray; i < cap; i++)
+                    interval[i] = this.block;
+                if (rightNode != null)
+                    interval = rightNode.getInterval((short)(endPoint + 1), end, (short)cap, endArray, interval);
+            }
+
+            if (start >= startPoint && end <= endPoint)
+                for (int i = startArray; i <= endArray; i++)
+                    interval[i] = this.block;
 
             return interval;
         }
