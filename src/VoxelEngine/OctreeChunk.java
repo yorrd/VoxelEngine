@@ -4,8 +4,8 @@ package VoxelEngine;
 // TODO search
 public class OctreeChunk extends Chunk<OctreeChunk.OctreeNode[]> {
 
-    OctreeChunk(TerrainGenerator generator) {
-        super(generator);
+    OctreeChunk(TerrainGenerator generator, Chunk[] neighbors) {
+        super(generator, neighbors);
     }
 
     @Override

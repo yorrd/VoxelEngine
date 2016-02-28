@@ -2,8 +2,8 @@ package VoxelEngine;
 
 public class ArrayChunk extends Chunk<Block[][][]> {
 
-    ArrayChunk(TerrainGenerator generator) {
-        super(generator);
+    ArrayChunk(TerrainGenerator generator, Chunk[] neighbors) {
+        super(generator, neighbors);
     }
 
     @Override
@@ -21,7 +21,7 @@ public class ArrayChunk extends Chunk<Block[][][]> {
         for (short x = 0; x < CHUNK_SIZE; x++) {
             for (short y = 0; y < CHUNK_SIZE; y++) {
                 for (short z = 0; z < CHUNK_SIZE; z++) {
-                    triggerBlockUpdate(x, y, z);
+                    triggerBlockUpdate(this, x, y, z);
                 }
             }
         }

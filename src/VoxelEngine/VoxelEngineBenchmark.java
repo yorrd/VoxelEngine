@@ -212,7 +212,7 @@ interface _Chunk extends Benchmark {
     class _IntervalTreeChunkSingle extends IntervalTreeChunk implements _Chunk {
 
         _IntervalTreeChunkSingle() {
-            super(generator);
+            super(generator, new Chunk[6]);
         }
 
         @Override
@@ -230,7 +230,7 @@ interface _Chunk extends Benchmark {
     class _IntervalTreeChunkMoore extends IntervalTreeChunk implements _Chunk {
 
         _IntervalTreeChunkMoore() {
-            super(generator);
+            super(generator, new Chunk[6]);
         }
 
         public BenchmarkResult _benchmark() {
@@ -252,7 +252,7 @@ interface _Chunk extends Benchmark {
     class _ArrayChunkSingle extends ArrayChunk implements _Chunk {
 
         _ArrayChunkSingle() {
-            super(generator);
+            super(generator, new Chunk[6]);
         }
 
         @Override
@@ -270,7 +270,7 @@ interface _Chunk extends Benchmark {
     class _ArrayChunkMoore extends ArrayChunk implements _Chunk {
 
         _ArrayChunkMoore() {
-            super(generator);
+            super(generator, new Chunk[6]);
         }
 
         public BenchmarkResult _benchmark() {

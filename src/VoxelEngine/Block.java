@@ -5,16 +5,6 @@ import java.util.Random;
 
 public class Block {
 
-    /*
-    sides in the visibilityFlags:
-        0 - top
-        1 - back
-        2 - right
-        3 - front
-        4 - left
-        5 - bottom
-     */
-
     public static final int TOP = 0;
     public static final int BACK = 1;
     public static final int RIGHT = 2;
@@ -22,6 +12,7 @@ public class Block {
     public static final int LEFT = 4;
     public static final int BOTTOM = 5;
     BitSet visibilityFlags = new BitSet(6);
+    Block[] neighbors = new Block[6];
 
     private BlockType type = BlockType.EMPTY;
 
@@ -51,11 +42,30 @@ public class Block {
     }
 
     public void blockUpdate(int side, Block updatedBlock) {
-        visibilityFlags.set(side, !updatedBlock.isEmtpy());
+        // updatedBlock == null means that the world has ended here and no block could be found
+        // TODO do we really need both?
+        if(updatedBlock != null) {
+            visibilityFlags.set(side, !updatedBlock.isEmtpy());
+        } else {
+            visibilityFlags.set(side, true);
+        }
+        neighbors[side] = updatedBlock;
+    }
+
+    public int oppositeSide(int side) {
+        switch (side) {
+            case TOP: return BOTTOM;
+            case BOTTOM: return TOP;
+            case LEFT: return RIGHT;
+            case RIGHT: return LEFT;
+            case FRONT: return BACK;
+            case BACK: return FRONT;
+            default: throw new IllegalStateException("It has to be one of the sides...");
+        }
     }
 
     public String toString() {
-        return "" + type;
+        return type.toString();
     }
 
 

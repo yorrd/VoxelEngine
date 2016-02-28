@@ -8,10 +8,18 @@ public abstract class Chunk<T> {
 
     protected T chunkmap;
 
-    Chunk(TerrainGenerator generator) {
+    Chunk[] neighbors;
+
+    Chunk(TerrainGenerator generator, Chunk[] neighbors) {
+        this.neighbors = neighbors;
         initializeChunk(generator);
     }
 
+    /**
+     * Fill with initial data (according to the generator) and do block updates for all blocks
+     *
+     * @param generator generator which tells us where to put what kind of block
+     */
     abstract void initializeChunk(TerrainGenerator generator);
 
     abstract void set(short x, short y, short z, Block block);
@@ -24,57 +32,69 @@ public abstract class Chunk<T> {
         return getInterval((short) 0, CHUNK_SIZE, (short) 0, CHUNK_SIZE, (short) 0, CHUNK_SIZE);
     }
 
-    void triggerBlockUpdate(short x, short y, short z) {
+    void triggerBlockUpdate(Chunk chunk, short x, short y, short z) {
 
-        Block changedBlock = get(x, y, z);
+        Block changedBlock = chunk.get(x, y, z);
 
-        if(z + 1 < CHUNK_SIZE) {
-            Block top = get(x, y, ((short) (z + 1)));
-            if (top != null)
-                top.blockUpdate(Block.BOTTOM, changedBlock);
-        } else {
-            // TODO chunk edge
+        Block top = null;
+        if(z + 1 < Chunk.CHUNK_SIZE) {
+            top = chunk.get(x, y, ((short) (z + 1)));
+        } else if(neighbors[Block.TOP] != null) {
+            top = neighbors[Block.TOP].get(x, y, (short) 0);
         }
+        if(top != null)
+            top.blockUpdate(Block.BOTTOM, changedBlock);
+        changedBlock.blockUpdate(Block.TOP, top);
 
-        if(y + 1 < CHUNK_SIZE) {
-            Block back = get(x, ((short) (y + 1)), z);
-            if (back != null)
-                back.blockUpdate(Block.FRONT, changedBlock);
-        } else {
-            // TODO chunk edge
+        Block back = null;
+        if(y + 1 < Chunk.CHUNK_SIZE) {
+            back = chunk.get(x, ((short) (y + 1)), z);
+        } else if(neighbors[Block.BACK] != null) {
+            back = neighbors[Block.BACK].get(x, (short) 0, z);
         }
+        if(back != null)
+            back.blockUpdate(Block.FRONT, changedBlock);
+        changedBlock.blockUpdate(Block.BACK, back);
 
-        if(x + 1 < CHUNK_SIZE) {
-            Block right = get(((short) (x + 1)), y, z);
-            if (right != null)
-                right.blockUpdate(Block.LEFT, changedBlock);
-        } else {
-            // TODO chunk edge
+        Block right = null;
+        if(x + 1 < Chunk.CHUNK_SIZE) {
+            right = chunk.get(((short) (x + 1)), y, z);
+        } else if(neighbors[Block.RIGHT] != null) {
+            right = neighbors[Block.RIGHT].get((short) 0, y, z);
         }
+        if(right != null)
+            right.blockUpdate(Block.LEFT, changedBlock);
+        changedBlock.blockUpdate(Block.RIGHT, right);
 
+        Block front = null;
         if(y - 1 > 0) {
-            Block front = get(x, ((short) (y - 1)), z);
-            if (front != null)
-                front.blockUpdate(Block.BACK, changedBlock);
-        } else {
-            // TODO chunk edge
+            front = chunk.get(x, ((short) (y - 1)), z);
+        } else if(neighbors[Block.FRONT] != null) {
+            front = neighbors[Block.FRONT].get(x, ((short) (CHUNK_SIZE - 1)), z);
         }
+        if(front != null)
+            front.blockUpdate(Block.BACK, changedBlock);
+        changedBlock.blockUpdate(Block.FRONT, front);
 
+        Block left = null;
         if(x - 1 > 0) {
-            Block left = get(((short) (x - 1)), y, z);
-            if (left != null)
-                left.blockUpdate(Block.RIGHT, changedBlock);
-        } else {
-            // TODO chunk edge
+            left = chunk.get(((short) (x - 1)), y, z);
+        } else if(neighbors[Block.LEFT] != null) {
+            left = neighbors[Block.LEFT].get(((short) (CHUNK_SIZE - 1)), y, z);
         }
+        if(left != null)
+            left.blockUpdate(Block.RIGHT, changedBlock);
+        changedBlock.blockUpdate(Block.LEFT, left);
 
+        Block bottom = null;
         if(z - 1 > 0) {
-            Block bottom = get(x, y, ((short) (z - 1)));
-            if (bottom != null)
-                bottom.blockUpdate(Block.TOP, changedBlock);
-        } else {
-            // TODO chunk edge
+            bottom = chunk.get(x, y, ((short) (z - 1)));
+        } else if(neighbors[Block.BOTTOM] != null) {
+            bottom = neighbors[Block.BOTTOM].get(x, y, ((short) (CHUNK_SIZE - 1)));
         }
+        if(bottom != null)
+            bottom.blockUpdate(Block.TOP, changedBlock);
+        changedBlock.blockUpdate(Block.BOTTOM, bottom);
     }
 
     abstract public String toString();

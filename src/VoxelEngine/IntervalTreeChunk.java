@@ -5,8 +5,8 @@ public class IntervalTreeChunk extends Chunk<IntervalTreeChunk.IntervalTreeNode>
     static final short CHUNK_VOLUME = Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE;
     private IntervalTreeNode intervalTree;
 
-    IntervalTreeChunk(TerrainGenerator generator) {
-        super(generator);
+    IntervalTreeChunk(TerrainGenerator generator, Chunk[] neighbors) {
+        super(generator, neighbors);
     }
 
     void initializeChunk(TerrainGenerator generator) {
