@@ -36,7 +36,7 @@ public class IntervalTreeChunk extends Chunk<IntervalTreeChunk.IntervalTreeNode>
         for (short y = 0; y < y2-y1; y++) {
             for (short z = 0; z < z2-z1; z++) {
                 tmp = (short) (CHUNK_SIZE*(z* Chunk.CHUNK_SIZE + y));
-                Block[] result = intervalTree.getInterval((short)(tmp + x1), (short)(tmp + x2), (short) 0, (short)(x2-x1-1), new Block[x2 - x1]);
+                Block[] result = intervalTree.getInterval((short)(tmp + x1), (short)(tmp + x2 - 1), (short) 0, (short)(x2-x1-1), new Block[x2 - x1]);
                 interval[y][z] = result;
             }
         }
@@ -118,15 +118,15 @@ public class IntervalTreeChunk extends Chunk<IntervalTreeChunk.IntervalTreeNode>
                 for (int i = startPoint - start; i < interval.length; i++) {
                     interval[i] = this.block;
                 }
-                interval = leftNode.getInterval(start, startPoint, startArray, endArray, interval);
+                interval = leftNode.getInterval(start, (short)(startPoint-1), startArray, endArray, interval);
                 return interval;
             }
 
-            if (start > startPoint && start < endPoint && end > endPoint) {
-                for (int i = 0; i < endPoint - start; i++) {
+            if (start >= startPoint && start <= endPoint && end >= endPoint) {
+                for (int i = 0; i <= endPoint - start; i++) {
                     interval[i] = this.block;
                 }
-                interval = rightNode.getInterval(endPoint, end, startArray, endArray, interval);
+                interval = rightNode.getInterval((short)(endPoint+1), end, startArray, endArray, interval);
                 return interval;
             }
 
