@@ -81,6 +81,10 @@ public class IntervalTreeChunk extends Chunk<IntervalTreeChunk.IntervalTreeNode>
             return endPoint;
         }
 
+        boolean isLeaf() {
+            return (leftNode == null) && (rightNode == null);
+        }
+
         Block getBlock(short x, short y, short z) {
             short onedimPoint = (short) ((z* Chunk.CHUNK_SIZE + y) * Chunk.CHUNK_SIZE + x);
 
@@ -94,12 +98,19 @@ public class IntervalTreeChunk extends Chunk<IntervalTreeChunk.IntervalTreeNode>
 
         private Block[] getInterval (short start, short end, short startArray, short endArray, Block[] interval) {
 
+            if (start >= startPoint && end <= endPoint) {
+                for (int i = 0; i < interval.length; i++) {
+                    interval[i] = this.block;
+                }
+                return interval;
+            }
+
             if (start < startPoint && end > endPoint) {
                 for (int i = startPoint - start; i <= endPoint - start; i++) {
                     interval[i] = this.block;
                 }
-                interval = leftNode.getInterval(start, startPoint, startArray, endArray, interval);
-                interval = rightNode.getInterval(endPoint, end, startArray, endArray, interval);
+                interval = leftNode.getInterval(start, (short)(startPoint-1), startArray, endArray, interval);
+                interval = rightNode.getInterval((short)(endPoint+1), end, startArray, endArray, interval);
                 return interval;
             }
 
@@ -119,12 +130,6 @@ public class IntervalTreeChunk extends Chunk<IntervalTreeChunk.IntervalTreeNode>
                 return interval;
             }
 
-            if (start > startPoint && end < endPoint) {
-                for (int i = 0; i < interval.length; i++) {
-                    interval[i] = this.block;
-                }
-                return interval;
-            }
 
             if (start > endPoint)
                 return rightNode.getInterval(start, end, startArray, endArray, interval);
