@@ -39,7 +39,7 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
     float viewDistance = 25f;
     float speed = .5f;
 
-    private int[] textures = new int[512];
+    private int[] textures = new int[2048];
 
     VoxelEngineDemo() {
 
@@ -96,6 +96,7 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
             textures[0] = TextureIO.newTexture(new File("./block_textures/stone.png"), true).getTextureObject();
             textures[1] = TextureIO.newTexture(new File("./block_textures/grass_side.png"), true).getTextureObject();
             textures[2] = TextureIO.newTexture(new File("./block_textures/glass.png"), true).getTextureObject();
+            textures[2048] = TextureIO.newTexture(new File("./block_textures/red.png"), true).getTextureObject();
         } catch (IOException e) {
             e.printStackTrace();
         }
