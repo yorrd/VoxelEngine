@@ -144,10 +144,16 @@ public class IntervalTreeChunk extends Chunk<IntervalTreeChunk.IntervalTreeNode>
         Block getBlock(short onedimPoint) {
             if (onedimPoint >= startPoint && onedimPoint <= endPoint)
                 return block;
-            else if (onedimPoint > endPoint)
+            else if (onedimPoint > endPoint && rightNode != null)
                 return rightNode.getBlock(onedimPoint);
-            else // if (onedimPoint < startPoint)
+            else if (onedimPoint < startPoint && leftNode != null)
                 return leftNode.getBlock(onedimPoint);
+
+            return null;
+        }
+
+        Block getBlock() {
+            return this.block;
         }
 
         void reduceIntervalLeft() {
@@ -168,6 +174,20 @@ public class IntervalTreeChunk extends Chunk<IntervalTreeChunk.IntervalTreeNode>
 
         IntervalTreeNode getNodeAtCoord(short coord) {
             return null;
+        }
+
+        boolean isParentOf(IntervalTreeNode node) {
+            return this.leftNode == node || this.rightNode == node;
+        }
+
+        int isChildOf(IntervalTreeNode node) {
+            int childOf = -1;
+            if (node.getLeftNode() == this)
+                childOf = 1;
+            if (node.getRightNode() == this)
+                childOf = 2;
+
+            return childOf;
         }
 
         private Block[] getInterval (short start, short end, short startArray, short endArray, Block[] interval) {
@@ -234,17 +254,78 @@ public class IntervalTreeChunk extends Chunk<IntervalTreeChunk.IntervalTreeNode>
                     this.rightNode = newRightNode;
                 }
             } else if (onedimcoord == startPoint && onedimcoord == endPoint){
+                IntervalTreeNode leftNode = getNodeAtCoord((short)(onedimcoord - 1));
+                IntervalTreeNode rightNode = getNodeAtCoord((short)(onedimcoord - 1));
+
                 if (type == this.block.getType()) {
                     return;
-                } else if (type == getBlock((short)(onedimcoord-1)).getType() && type == getBlock((short)(onedimcoord+1)).getType()) {
-                    if (getNodeAtCoord((short)(onedimcoord - 1)).isLeaf() && getNodeAtCoord((short)(onedimcoord + 1)).isLeaf()) {
-
+                } else if (leftNode != null && rightNode != null &&
+                        (leftNode.isParentOf(this) || leftNode.isChildOf(this) > 0) &&
+                        (rightNode.isParentOf(this) || rightNode.isChildOf(this) > 0) &&
+                        leftNode.getBlock().getType() == type && rightNode.getBlock().getType() == type) {
+                    IntervalTreeNode newNode = new IntervalTreeNode (block, leftNode.getStart(), (short)(rightNode.getEnd() - leftNode.getStart()));
+                    newNode.setLeftNode(leftNode.getLeftNode());
+                    newNode.setRightNode(rightNode.getRightNode());
+                    if (leftNode.isParentOf(this))
+                        if (getParentOfCoord(leftNode.getStart()).getRightNode() == leftNode)
+                            getParentOfCoord(leftNode.getStart()).setRightNode(newNode);
+                        if (getParentOfCoord(leftNode.getStart()).getLeftNode() == leftNode)
+                            getParentOfCoord(leftNode.getStart()).setLeftNode(newNode);
+                    else if (rightNode.isParentOf(this)) {
+                            if (getParentOfCoord(rightNode.getStart()).getRightNode() == leftNode)
+                                getParentOfCoord(rightNode.getStart()).setRightNode(newNode);
+                            if (getParentOfCoord(rightNode.getStart()).getLeftNode() == leftNode)
+                                getParentOfCoord(rightNode.getStart()).setLeftNode(newNode);
+                        }
+                    else if (getParentOfCoord(this.startPoint).getLeftNode() == this)
+                        getParentOfCoord(this.startPoint).setLeftNode(newNode);
+                        else
+                            getParentOfCoord(this.startPoint).setRightNode(newNode);
+                } else if (leftNode != null &&
+                        (leftNode.isParentOf(this) || leftNode.isChildOf(this) > 0) &&
+                        leftNode.getBlock().getType() == type) {
+                    IntervalTreeNode newNode = new IntervalTreeNode(block, leftNode.getStart(), (short)(onedimcoord - leftNode.getStart()));
+                    if (leftNode.isParentOf(this)) {
+                        newNode.setLeftNode(leftNode.getLeftNode());
+                        newNode.setRightNode(this.rightNode);
+                        if (getParentOfCoord(leftNode.getStart()).getRightNode() == leftNode)
+                            getParentOfCoord(leftNode.getStart()).setRightNode(newNode);
+                        if (getParentOfCoord(leftNode.getStart()).getLeftNode() == leftNode)
+                            getParentOfCoord(leftNode.getStart()).setLeftNode(newNode);
+                    } else {
+                        newNode.setLeftNode(leftNode.getLeftNode());
+                        newNode.setRightNode(this.rightNode);
+                        if (getParentOfCoord(this.startPoint).getRightNode() == leftNode)
+                            getParentOfCoord(this.startPoint).setRightNode(newNode);
+                        if (getParentOfCoord(this.startPoint).getLeftNode() == leftNode)
+                            getParentOfCoord(this.startPoint).setLeftNode(newNode);
                     }
+                } else if (rightNode != null &&
+                        (rightNode.isParentOf(this) || rightNode.isChildOf(this) > 0) &&
+                        rightNode.getBlock().getType() == type) {
+                    IntervalTreeNode newNode = new IntervalTreeNode(block, onedimcoord, (short)(rightNode.getEnd() - onedimcoord));
+                    if (rightNode.isParentOf(this)) {
+                        newNode.setRightNode(rightNode.getRightNode());
+                        newNode.setLeftNode(this.leftNode);
+                        if (getParentOfCoord(rightNode.getStart()).getRightNode() == rightNode)
+                            getParentOfCoord(rightNode.getStart()).setRightNode(newNode);
+                        if (getParentOfCoord(rightNode.getStart()).getLeftNode() == rightNode)
+                            getParentOfCoord(rightNode.getStart()).setLeftNode(newNode);
+                    } else {
+                        newNode.setLeftNode(this.leftNode);
+                        newNode.setRightNode(rightNode.getRightNode());
+                        if (getParentOfCoord(this.startPoint).getRightNode() == leftNode)
+                            getParentOfCoord(this.startPoint).setRightNode(newNode);
+                        if (getParentOfCoord(this.startPoint).getLeftNode() == leftNode)
+                            getParentOfCoord(this.startPoint).setLeftNode(newNode);
+                    }
+                } else {
+                    this.block = block;
                 }
             } else if (onedimcoord == startPoint) {
                 if (type == this.block.getType())
                     return;
-                else if (type == getBlock((short)(onedimcoord-1)).getType()){
+                else if (onedimcoord > 0 && getBlock((short)(onedimcoord-1)) != null && type == getBlock((short)(onedimcoord-1)).getType()){
                     this.reduceIntervalLeft();
                     extendIntervalRight((short)(onedimcoord-1));
                 } else {
@@ -257,7 +338,8 @@ public class IntervalTreeChunk extends Chunk<IntervalTreeChunk.IntervalTreeNode>
             } else if (onedimcoord == endPoint) {
                 if (type == this.block.getType())
                     return;
-                else if (type == getBlock((short)(onedimcoord + 1)).getType()) {
+                else if (getBlock((short)(onedimcoord + 1)) != null &&
+                        type == getBlock((short)(onedimcoord + 1)).getType()) {
                     this.reduceIntervalRight();
                     extendIntervalLeft((short)(onedimcoord + 1));
                 } else {
