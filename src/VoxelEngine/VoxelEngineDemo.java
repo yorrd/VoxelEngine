@@ -14,6 +14,7 @@ import static com.jogamp.opengl.GL2.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
@@ -57,6 +58,9 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
             VoxelEngineDemo.this.setPreferredSize(new Dimension(1024, 720));
             frame = new JFrame();
             frame.getContentPane().add(VoxelEngineDemo.this);
+            BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+//            frame.getContentPane().setCursor(Toolkit.getDefaultToolkit().createCustomCursor(
+//                    cursorImg, new Point(0, 0), "blank cursor"));
 
             FPSAnimator animator = new FPSAnimator(VoxelEngineDemo.this, FPS, false);
 
@@ -96,7 +100,7 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
             textures[0] = TextureIO.newTexture(new File("./block_textures/stone.png"), true).getTextureObject();
             textures[1] = TextureIO.newTexture(new File("./block_textures/grass_side.png"), true).getTextureObject();
             textures[2] = TextureIO.newTexture(new File("./block_textures/glass.png"), true).getTextureObject();
-            textures[2048] = TextureIO.newTexture(new File("./block_textures/red.png"), true).getTextureObject();
+            textures[2047] = TextureIO.newTexture(new File("./block_textures/red.png"), true).getTextureObject();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -238,18 +242,23 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
 
         @Override
         public void keyPressed(KeyEvent e) {
+            // TODO press two at once
             switch (e.getKeyCode()) {
-                case KeyEvent.VK_D:
-                    cameraX += speed;
+                case KeyEvent.VK_W:  // ahead
+                    cameraX += speed * Math.sin(cameraLeftRight);
+                    cameraY -= speed * Math.cos(cameraLeftRight);
                     break;
-                case KeyEvent.VK_A:
-                    cameraX -= speed;
+                case KeyEvent.VK_S:  // backwards
+                    cameraX -= speed * Math.sin(cameraLeftRight);
+                    cameraY += speed * Math.cos(cameraLeftRight);
                     break;
-                case KeyEvent.VK_S:
-                    cameraY += speed;
+                case KeyEvent.VK_A:  // step left
+                    cameraX -= speed * Math.cos(cameraLeftRight);
+                    cameraY -= speed * Math.sin(cameraLeftRight);
                     break;
-                case KeyEvent.VK_W:
-                    cameraY -= speed;
+                case KeyEvent.VK_D:  // step right
+                    cameraX += speed * Math.cos(cameraLeftRight);
+                    cameraY += speed * Math.sin(cameraLeftRight);
                     break;
                 case KeyEvent.VK_SPACE:
                     cameraZ += speed;
@@ -271,6 +280,8 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
         private int oldX = 0;
         private int oldY = 0;
 
+        final static int THRESHOLD = 50;
+
         VoxelEngineMouseMotionListener() throws AWTException {
             robot = new Robot();
         }
@@ -282,10 +293,24 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
 
         @Override
         public void mouseMoved(MouseEvent e) {
-            // TODO NEVER MOVE THE WINDOW or else...
+            // TODO view jumps back when triggering the edge reset
 
-            cameraLeftRight += (e.getX() - oldX) / 100D;
-            cameraUpDown += (e.getY() - oldY) / 100D;
+            System.out.println(cameraLeftRight);
+            System.out.println(cameraUpDown);
+            System.out.println("==============");
+            cameraLeftRight += Math.asin((e.getX() - oldX) / viewDistance);
+            cameraUpDown += Math.asin((e.getY() - oldY) / viewDistance);
+
+            // edge reset to center if cursor is about to leave
+            int width = getWidth();
+            int height = getHeight();
+            int mouseX = e.getX();
+            int mouseY = e.getY();
+
+            if(mouseX - THRESHOLD < 0 || mouseX + THRESHOLD > width || mouseY - THRESHOLD < 0 || mouseY + THRESHOLD > height) {
+                robot.mouseMove(getLocationOnScreen().x + getWidth() / 2, getLocationOnScreen().y + getHeight() / 2);
+            }
+
             oldX = e.getX();
             oldY = e.getY();
         }
