@@ -17,12 +17,15 @@ import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.BitSet;
 
 public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
 
     public static String TITLE = "VoxelEngine Simple Demo";
     private static final int FPS = 60;
+    protected static final float MOUSE_SPEED = .2f;
     protected JFrame frame;
+    protected VoxelEngineKeyListener keyListener;
 
     protected static World world;
 
@@ -38,7 +41,7 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
     // XZ position of the camera
     float cameraX = 0.0f, cameraY = 5.0f, cameraZ = 0.0f;
     float viewDistance = 25f;
-    float speed = .5f;
+    float movementSpeed = .15f;
 
     private int[] textures = new int[2048];
 
@@ -51,7 +54,8 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
             // fail, whatever
             System.out.println("failed to initialize mouse listener");
         }
-        this.addKeyListener(new VoxelEngineKeyListener());
+        keyListener = new VoxelEngineKeyListener();
+        this.addKeyListener(keyListener);
         world = new World();
 
         SwingUtilities.invokeLater(() -> {
@@ -128,9 +132,8 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
         GL2 gl = drawable.getGL().getGL2();  // get the OpenGL 2 graphics context
         gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         gl.glLoadIdentity();
-        glu.gluLookAt(cameraX, cameraZ, cameraY,
-                      cameraX + viewDistance * Math.sin(cameraLeftRight), cameraZ + viewDistance * Math.tan(cameraUpDown), cameraY + -1 * viewDistance * Math.cos(cameraLeftRight),
-                      0f, 1f, 0f);
+
+        updateCamera();
 
         Chunk[][] chunks = world.getVisibleChunks();
 
@@ -233,8 +236,45 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
 
     }
 
+    private void updateCamera() {
+        glu.gluLookAt(cameraX, cameraZ, cameraY,
+                cameraX + viewDistance * Math.sin(cameraLeftRight), cameraZ + viewDistance * Math.tan(cameraUpDown), cameraY + -1 * viewDistance * Math.cos(cameraLeftRight),
+                0f, 1f, 0f);
+
+        if(keyListener.keysDown.get(VoxelEngineKeyListener.FRONT)) {
+            cameraX += movementSpeed * Math.sin(cameraLeftRight);
+            cameraY -= movementSpeed * Math.cos(cameraLeftRight);
+        }
+        if(keyListener.keysDown.get(VoxelEngineKeyListener.BACK)) {
+            cameraX -= movementSpeed * Math.sin(cameraLeftRight);
+            cameraY += movementSpeed * Math.cos(cameraLeftRight);
+        }
+        if(keyListener.keysDown.get(VoxelEngineKeyListener.UP)) {
+            cameraZ += movementSpeed;
+        }
+        if(keyListener.keysDown.get(VoxelEngineKeyListener.DOWN)) {
+            cameraZ -= movementSpeed;
+        }
+        if(keyListener.keysDown.get(VoxelEngineKeyListener.LEFT)) {
+            cameraX -= movementSpeed * Math.cos(cameraLeftRight);
+            cameraY -= movementSpeed * Math.sin(cameraLeftRight);
+        }
+        if(keyListener.keysDown.get(VoxelEngineKeyListener.RIGHT)) {
+            cameraX += movementSpeed * Math.cos(cameraLeftRight);
+            cameraY += movementSpeed * Math.sin(cameraLeftRight);
+        }
+    }
+
 
     class VoxelEngineKeyListener implements KeyListener {
+
+        static final int UP = 0;
+        static final int BACK = 1;
+        static final int RIGHT = 2;
+        static final int FRONT = 3;
+        static final int LEFT = 4;
+        static final int DOWN = 5;
+        public BitSet keysDown = new BitSet(6);
 
         @Override
         public void keyTyped(KeyEvent e) {
@@ -242,36 +282,35 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
 
         @Override
         public void keyPressed(KeyEvent e) {
-            // TODO press two at once
-            // TODO don't delay first continuous
-            switch (e.getKeyCode()) {
-                case KeyEvent.VK_W:  // ahead
-                    cameraX += speed * Math.sin(cameraLeftRight);
-                    cameraY -= speed * Math.cos(cameraLeftRight);
-                    break;
-                case KeyEvent.VK_S:  // backwards
-                    cameraX -= speed * Math.sin(cameraLeftRight);
-                    cameraY += speed * Math.cos(cameraLeftRight);
-                    break;
-                case KeyEvent.VK_A:  // step left
-                    cameraX -= speed * Math.cos(cameraLeftRight);
-                    cameraY -= speed * Math.sin(cameraLeftRight);
-                    break;
-                case KeyEvent.VK_D:  // step right
-                    cameraX += speed * Math.cos(cameraLeftRight);
-                    cameraY += speed * Math.sin(cameraLeftRight);
-                    break;
-                case KeyEvent.VK_SPACE:
-                    cameraZ += speed;
-                    break;
-                case KeyEvent.VK_SHIFT:
-                    cameraZ -= speed;
-                    break;
-            }
+            toggleKey(e.getKeyCode(), true);
         }
 
         @Override
         public void keyReleased(KeyEvent e) {
+            toggleKey(e.getKeyCode(), false);
+        }
+
+        private void toggleKey(int keyCode, boolean onOff) {
+            switch (keyCode) {
+                case KeyEvent.VK_W:
+                    keysDown.set(FRONT, onOff);
+                    break;
+                case KeyEvent.VK_S:
+                    keysDown.set(BACK, onOff);
+                    break;
+                case KeyEvent.VK_A:
+                    keysDown.set(LEFT, onOff);
+                    break;
+                case KeyEvent.VK_D:
+                    keysDown.set(RIGHT, onOff);
+                    break;
+                case KeyEvent.VK_SPACE:
+                    keysDown.set(UP, onOff);
+                    break;
+                case KeyEvent.VK_SHIFT:
+                    keysDown.set(DOWN, onOff);
+                    break;
+            }
         }
     }
 
@@ -294,7 +333,6 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
 
         @Override
         public void mouseMoved(MouseEvent e) {
-            // TODO view jumps back when triggering the edge reset
 
             if(Math.abs((e.getX() - oldX) / viewDistance) > 1 || Math.abs((e.getY() - oldY) / viewDistance) > 1){
                 oldX = e.getX();
@@ -302,8 +340,8 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
                 return;
             }
 
-            cameraLeftRight += Math.asin((e.getX() - oldX) / viewDistance);
-            cameraUpDown -= Math.asin((e.getY() - oldY) / viewDistance);
+            cameraLeftRight += Math.asin((e.getX() - oldX) / viewDistance) * MOUSE_SPEED;
+            cameraUpDown -= Math.asin((e.getY() - oldY) / viewDistance) * MOUSE_SPEED;
             if(cameraUpDown >= Math.PI / 2) {
                 cameraUpDown = (float) (Math.PI / 2) - 0.001f;
             } else if(cameraUpDown <= -Math.PI / 2) {
