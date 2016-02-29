@@ -114,27 +114,27 @@ public class IntervalTreeChunk extends Chunk<IntervalTreeChunk.IntervalTreeNode>
             }
 
             if (start < startPoint && end > endPoint) {
-                for (int i = startPoint - start; i <= endPoint - start; i++) {
+                for (int i = startArray + startPoint - start; i <= ((endPoint - start + startArray < endArray)? endPoint - start + startArray : endArray); i++) {
                     interval[i] = this.block;
                 }
-                interval = leftNode.getInterval(start, (short)(startPoint-1), startArray, (short)(endPoint - start + 1), interval);
-                interval = rightNode.getInterval((short)(endPoint+1), end, (short)(endPoint - start), endArray, interval);
+                interval = leftNode.getInterval(start, (short)(startPoint-1), startArray, (short)(endPoint - start + 1 + startArray), interval);
+                interval = rightNode.getInterval((short)(endPoint+1), end, (short)(endPoint - start + startArray + 1), endArray, interval);
                 return interval;
             }
 
             if (start < startPoint && end >= startPoint && end <= endPoint) {
-                for (int i = startPoint - start; i < interval.length; i++) {
+                for (int i = startArray + startPoint - start; i <= endArray; i++) {
                     interval[i] = this.block;
                 }
-                interval = leftNode.getInterval(start, (short)(startPoint-1), startArray, (short)(startPoint - start + 1), interval);
+                interval = leftNode.getInterval(start, (short)(startPoint-1), startArray, (short)(startPoint - start + startArray), interval);
                 return interval;
             }
 
-            if (start >= startPoint && start <= endPoint && end >= endPoint) {
-                for (int i = 0; i <= endPoint - start; i++) {
+            if (start >= startPoint && start <= endPoint && end > endPoint) {
+                for (int i = startArray; i <= ((endPoint - start + startArray < endArray)? endPoint - start + startArray : endArray); i++) {
                     interval[i] = this.block;
                 }
-                interval = rightNode.getInterval((short)(endPoint+1), end, (short)(endPoint - start), endArray, interval);
+                interval = rightNode.getInterval((short)(endPoint+1), end, (short)(endPoint - start + startArray + 1), endArray, interval);
                 return interval;
             }
 
@@ -144,34 +144,7 @@ public class IntervalTreeChunk extends Chunk<IntervalTreeChunk.IntervalTreeNode>
 
             if (end < startPoint)
                 return leftNode.getInterval(start, end, startArray, endArray, interval);
-/*
-            if (end < start)
-                return interval;
 
-            if (end == start) {
-                interval[startArray] = this.block;
-                return interval;
-            }
-
-            if (start < startPoint) { //start of searched array left from current interval
-                for (int i = startArray; i < ((startPoint - start < endArray)? startPoint - start: endArray); i++)
-                    interval[i] = this.block;
-                if (leftNode != null)
-                    interval = leftNode.getInterval(start, (short)(startPoint - 1), startArray, (short)((startPoint - start < endArray)? startPoint - start: endArray), interval);
-            }
-
-            if (end > endPoint) { //end of searched array right from current interval
-                int cap = ((endPoint + 1 < endArray)? endPoint + 1 : endArray);
-                for (int i = startArray; i < cap; i++)
-                    interval[i] = this.block;
-                if (rightNode != null)
-                    interval = rightNode.getInterval((short)(endPoint + 1), end, (short)cap, endArray, interval);
-            }
-
-            if (start >= startPoint && end <= endPoint)
-                for (int i = startArray; i <= endArray; i++)
-                    interval[i] = this.block;
-*/
             return interval;
         }
 
