@@ -59,8 +59,8 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
             frame = new JFrame();
             frame.getContentPane().add(VoxelEngineDemo.this);
             BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
-//            frame.getContentPane().setCursor(Toolkit.getDefaultToolkit().createCustomCursor(
-//                    cursorImg, new Point(0, 0), "blank cursor"));
+            frame.getContentPane().setCursor(Toolkit.getDefaultToolkit().createCustomCursor(
+                    cursorImg, new Point(0, 0), "blank cursor"));
 
             FPSAnimator animator = new FPSAnimator(VoxelEngineDemo.this, FPS, false);
 
@@ -129,7 +129,7 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
         gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         gl.glLoadIdentity();
         glu.gluLookAt(cameraX, cameraZ, cameraY,
-                      cameraX + viewDistance * (float) Math.sin(cameraLeftRight), cameraZ + viewDistance * (float) Math.sin(cameraUpDown), cameraY + -1 * viewDistance * (float) Math.cos(cameraLeftRight),
+                      cameraX + viewDistance * Math.sin(cameraLeftRight), cameraZ + viewDistance * Math.tan(cameraUpDown), cameraY + -1 * viewDistance * Math.cos(cameraLeftRight),
                       0f, 1f, 0f);
 
         Chunk[][] chunks = world.getVisibleChunks();
@@ -243,6 +243,7 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
         @Override
         public void keyPressed(KeyEvent e) {
             // TODO press two at once
+            // TODO don't delay first continuous
             switch (e.getKeyCode()) {
                 case KeyEvent.VK_W:  // ahead
                     cameraX += speed * Math.sin(cameraLeftRight);
@@ -303,6 +304,11 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
 
             cameraLeftRight += Math.asin((e.getX() - oldX) / viewDistance);
             cameraUpDown -= Math.asin((e.getY() - oldY) / viewDistance);
+            if(cameraUpDown >= Math.PI / 2) {
+                cameraUpDown = (float) (Math.PI / 2) - 0.001f;
+            } else if(cameraUpDown <= -Math.PI / 2) {
+                cameraUpDown = (float) (-Math.PI / 2) + 0.001f;
+            }
 
             // edge reset to center if cursor is about to leave
             int width = getWidth();
