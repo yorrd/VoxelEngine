@@ -295,11 +295,14 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
         public void mouseMoved(MouseEvent e) {
             // TODO view jumps back when triggering the edge reset
 
-            System.out.println(cameraLeftRight);
-            System.out.println(cameraUpDown);
-            System.out.println("==============");
+            if(Math.abs((e.getX() - oldX) / viewDistance) > 1 || Math.abs((e.getY() - oldY) / viewDistance) > 1){
+                oldX = e.getX();
+                oldY = e.getY();
+                return;
+            }
+
             cameraLeftRight += Math.asin((e.getX() - oldX) / viewDistance);
-            cameraUpDown += Math.asin((e.getY() - oldY) / viewDistance);
+            cameraUpDown -= Math.asin((e.getY() - oldY) / viewDistance);
 
             // edge reset to center if cursor is about to leave
             int width = getWidth();
