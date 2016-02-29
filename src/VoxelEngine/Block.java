@@ -75,6 +75,7 @@ public class Block {
         STONE (0, "stone", "texture"),
         GRASS (1, "grass", "texture"),
         GLASS (2, "glass", "texture"),
+        DEBUG (2048, "debug", "texture"),
         ;
 
         int ID;
