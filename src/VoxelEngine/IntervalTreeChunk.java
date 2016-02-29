@@ -19,13 +19,13 @@ public class IntervalTreeChunk extends Chunk<IntervalTreeChunk.IntervalTreeNode>
             }
         }
         // TODO make this more efficient
-        for (short x = 0; x < CHUNK_SIZE; x++) {
-            for (short y = 0; y < CHUNK_SIZE; y++) {
-                for (short z = 0; z < CHUNK_SIZE; z++) {
-                    triggerBlockUpdate(this, x, y, z);
-                }
-            }
-        }
+//        for (short x = 0; x < CHUNK_SIZE; x++) {
+//            for (short y = 0; y < CHUNK_SIZE; y++) {
+//                for (short z = 0; z < CHUNK_SIZE; z++) {
+//                    triggerBlockUpdate(this, x, y, z);
+//                }
+//            }
+//        }
     }
 
     void set(short x, short y, short z, Block block) {
@@ -39,18 +39,23 @@ public class IntervalTreeChunk extends Chunk<IntervalTreeChunk.IntervalTreeNode>
     //TODO In welche Richtung die Intervalle durchlaufen?
     //Aktuelle Annahme yzx
     Block[][][] getInterval(short x1, short x2, short y1, short y2, short z1, short z2) {
-       // Block[][][] interval = new Block[y2-y1][z2-z1][x2-x1];
-        Block[][][] interval = new Block[x2-x1][y2-y1][z2-z1];
+        Block[][][] interval = new Block[y2-y1][z2-z1][x2-x1];
+       // Block[][][] interval = new Block[x2-x1][y2-y1][z2-z1];
+        Block emptyBlock = new Block(Block.BlockType.EMPTY);
         short tmp;
         for (short y = 0; y < y2-y1; y++) {
             for (short z = 0; z < z2-z1; z++) {
-               /* tmp = (short) (CHUNK_SIZE*(z* Chunk.CHUNK_SIZE + y));
-                Block[] result = intervalTree.getInterval((short)(tmp + x1), (short)(tmp + x2 - 1), (short) 0, (short)(x2-x1-1), new Block[x2 - x1]);
-                interval[y][z] = result; */
-
+                tmp = (short) (CHUNK_SIZE*(z* Chunk.CHUNK_SIZE + y));
+                Block[] result = new Block[x2-x1];
+                for (int i = 0; i < result.length; i++) {
+                    result[i] = emptyBlock;
+                }
+                result = intervalTree.getInterval((short)(tmp + x1), (short)(tmp + x2 - 1), (short) 0, (short)(x2-x1-1), result);
+                interval[y][z] = result;
+/*
                 for (short x = 0; x < x2-x1; x++) {
                     interval[x][y][z] = intervalTree.getBlock(x, y, z);
-                }
+                } */
             }
         }
         return interval;
