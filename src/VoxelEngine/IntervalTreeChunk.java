@@ -41,7 +41,7 @@ public class IntervalTreeChunk extends Chunk<IntervalTreeChunk.IntervalTreeNode>
     Block[][][] getInterval(short x1, short x2, short y1, short y2, short z1, short z2) {
         Block[][][] interval = new Block[y2-y1][z2-z1][x2-x1];
        // Block[][][] interval = new Block[x2-x1][y2-y1][z2-z1];
-        Block emptyBlock = new Block(Block.BlockType.EMPTY);
+        Block emptyBlock = new Block(Block.BlockType.GLASS);
         short tmp;
         for (short y = 0; y < y2-y1; y++) {
             for (short z = 0; z < z2-z1; z++) {
@@ -59,16 +59,6 @@ public class IntervalTreeChunk extends Chunk<IntervalTreeChunk.IntervalTreeNode>
             }
         }
         return interval;
-    }
-
-    @Deprecated
-    void moveDown() {
-        //not to be implemented
-    }
-
-    @Deprecated
-    void showCoordinateBlocks() {
-        //not to be implemented
     }
 
     IntervalTreeNode getParentOfCoord (short coord) {
