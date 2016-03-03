@@ -152,6 +152,8 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
 
         Block[][][] chunkBlocks = chunk.getEntireChunk();
 
+        System.out.println("=====================");
+
         float blockSize = Chunk.GRID_SIZE / 1000;  // convert to meters
         float halfBlockSize = blockSize / 2f;
 
@@ -161,6 +163,10 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
 
                     Block current = chunkBlocks[x][y][z];
                     if(current.isEmtpy() || current.isHidden()) continue;
+
+                    System.out.println("Position: " + x + " " + y + " " + z);
+                    System.out.println("Material: " + current.getType());
+                    System.out.println("Vis Flags: " + current.visibilityFlags);
 
                     gl.glPushMatrix();
 
