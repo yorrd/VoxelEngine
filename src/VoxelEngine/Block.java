@@ -25,6 +25,10 @@ public class Block {
         return type;
     }
 
+    public void setType(BlockType bt) {
+        type = bt;
+    }
+
     public void setEmpty() {
         type = BlockType.EMPTY;
     }
@@ -75,7 +79,7 @@ public class Block {
         STONE (0, "stone", "texture"),
         GRASS (1, "grass", "texture"),
         GLASS (2, "glass", "texture"),
-        DEBUG (2048, "debug", "texture"),
+        DEBUG (2047, "debug", "texture"),
         ;
 
         int ID;

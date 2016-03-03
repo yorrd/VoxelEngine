@@ -134,6 +134,7 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
         gl.glLoadIdentity();
 
         updateCamera();
+        drawDebugCoordinateSystem(gl);
 
         Chunk[][] chunks = world.getVisibleChunks();
 
@@ -144,11 +145,14 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
                 drawChunk(gl, chunks[x][y], chunkX, chunkY);
             }
         }
+
     }
 
     protected void drawChunk(GL2 gl, Chunk chunk, int chunkX, int chunkY) {
 
         Block[][][] chunkBlocks = chunk.getEntireChunk();
+
+        System.out.println("=====================");
 
         float blockSize = Chunk.GRID_SIZE / 1000;  // convert to meters
         float halfBlockSize = blockSize / 2f;
@@ -159,6 +163,10 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
 
                     Block current = chunkBlocks[x][y][z];
                     if(current.isEmtpy() || current.isHidden()) continue;
+
+                    System.out.println("Position: " + x + " " + y + " " + z);
+                    System.out.println("Material: " + current.getType());
+                    System.out.println("Vis Flags: " + current.visibilityFlags);
 
                     gl.glPushMatrix();
 
@@ -263,6 +271,33 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
             cameraX += movementSpeed * Math.cos(cameraLeftRight);
             cameraY += movementSpeed * Math.sin(cameraLeftRight);
         }
+    }
+
+    private void drawDebugCoordinateSystem(GL2 gl) {
+        gl.glPushMatrix();
+
+        gl.glTranslated(cameraX + viewDistance * Math.sin(cameraLeftRight),
+                cameraZ + viewDistance * Math.tan(cameraUpDown),
+                cameraY + -1 * viewDistance * Math.cos(cameraLeftRight));
+
+        gl.glLineWidth(2f);
+        gl.glBegin(GL_LINES);
+
+        gl.glColor3f(1.0f, 0.0f, 0.0f);
+        gl.glVertex3f(0.0f, 0.0f, 0.0f);
+        gl.glVertex3f(4.0f, 0.0f, 0.0f);
+
+        gl.glColor3f(0.0f, 1.0f, 0.0f);
+        gl.glVertex3f(0.0f, 0.0f, 0.0f);
+        gl.glVertex3f(0.0f, 4.0f, 0.0f);
+
+        gl.glColor3f(0.0f, 0.0f, 1.0f);
+        gl.glVertex3f(0.0f, 0.0f, 0.0f);
+        gl.glVertex3f(0.0f, 0.0f, 4.0f);
+        gl.glEnd();
+
+        gl.glPopMatrix();
+        gl.glColor3f(1f,1f,1f);
     }
 
 
