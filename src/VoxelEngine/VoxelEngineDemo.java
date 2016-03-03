@@ -134,6 +134,7 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
         gl.glLoadIdentity();
 
         updateCamera();
+        drawDebugCoordinateSystem(gl);
 
         Chunk[][] chunks = world.getVisibleChunks();
 
@@ -144,6 +145,7 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
                 drawChunk(gl, chunks[x][y], chunkX, chunkY);
             }
         }
+
     }
 
     protected void drawChunk(GL2 gl, Chunk chunk, int chunkX, int chunkY) {
@@ -263,6 +265,33 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
             cameraX += movementSpeed * Math.cos(cameraLeftRight);
             cameraY += movementSpeed * Math.sin(cameraLeftRight);
         }
+    }
+
+    private void drawDebugCoordinateSystem(GL2 gl) {
+        gl.glPushMatrix();
+
+        gl.glTranslated(cameraX + viewDistance * Math.sin(cameraLeftRight),
+                cameraZ + viewDistance * Math.tan(cameraUpDown),
+                cameraY + -1 * viewDistance * Math.cos(cameraLeftRight));
+
+        gl.glLineWidth(2f);
+        gl.glBegin(GL_LINES);
+
+        gl.glColor3f(1.0f, 0.0f, 0.0f);
+        gl.glVertex3f(0.0f, 0.0f, 0.0f);
+        gl.glVertex3f(4.0f, 0.0f, 0.0f);
+
+        gl.glColor3f(0.0f, 1.0f, 0.0f);
+        gl.glVertex3f(0.0f, 0.0f, 0.0f);
+        gl.glVertex3f(0.0f, 4.0f, 0.0f);
+
+        gl.glColor3f(0.0f, 0.0f, 1.0f);
+        gl.glVertex3f(0.0f, 0.0f, 0.0f);
+        gl.glVertex3f(0.0f, 0.0f, 4.0f);
+        gl.glEnd();
+
+        gl.glPopMatrix();
+        gl.glColor3f(1f,1f,1f);
     }
 
 
