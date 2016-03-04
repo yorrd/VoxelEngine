@@ -18,6 +18,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.BitSet;
+import java.util.HashMap;
 
 public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
 
@@ -43,7 +44,7 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
     float viewDistance = 25f;
     float movementSpeed = .15f;
 
-    private int[] textures = new int[2048];
+    private HashMap<Block.BlockType, Integer[]> textures = new HashMap<>();
 
     VoxelEngineDemo() {
 
@@ -101,11 +102,15 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
         gl.glShadeModel(GL_SMOOTH);
 
         try {
-            textures[0] = TextureIO.newTexture(new File("./block_textures/stone.png"), true).getTextureObject();
-            textures[1] = TextureIO.newTexture(new File("./block_textures/grass_side.png"), true).getTextureObject();
-            textures[2] = TextureIO.newTexture(new File("./block_textures/glass.png"), true).getTextureObject();
-            textures[2047] = TextureIO.newTexture(new File("./block_textures/red.png"), true).getTextureObject();
+            for(Block.BlockType type : Block.BlockType.values()) {
+                textures.put(type, new Integer[6]);
+                String[] files = type.getTextureFiles();
+                for(int i = 0; i < 6; i++) {
+                    textures.get(type)[i] = TextureIO.newTexture(new File(files[i]), true).getTextureObject();
+                }
+            }
         } catch (IOException e) {
+            System.out.println("IOERROR");
             e.printStackTrace();
         }
     }
@@ -149,6 +154,7 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
     }
 
     protected void drawChunk(GL2 gl, Chunk chunk, int chunkX, int chunkY) {
+        // TODO don't iterate over blocks but rather over equally textured sides
 
         Block[][][] chunkBlocks = chunk.getEntireChunk();
 
@@ -173,7 +179,7 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
                     gl.glEnable(GL_TEXTURE_2D);
                     gl.glEnable(GL_BLEND);
                     gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-                    gl.glBindTexture(GL_TEXTURE_2D, textures[current.getType().ID]);
+                    gl.glBindTexture(GL_TEXTURE_2D, textures.get(current.getType())[0]);
                     gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
                     gl.glBegin(GL_QUADS);
 

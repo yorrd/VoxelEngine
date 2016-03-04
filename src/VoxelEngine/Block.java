@@ -1,5 +1,7 @@
 package VoxelEngine;
 
+import sun.plugin.dom.exception.InvalidStateException;
+
 import java.util.BitSet;
 import java.util.Random;
 
@@ -75,18 +77,24 @@ public class Block {
 
     public enum BlockType {
 
-        EMPTY (-1, "empty", "texture"),
-        STONE (0, "stone", "texture"),
-        GRASS (1, "grass", "texture"),
-        GLASS (2, "glass", "texture"),
-        DEBUG (2047, "debug", "texture"),
+        EMPTY (-1, "empty", "./block_textures/red.png"),
+        STONE (0, "stone", "./block_textures/stone.png"),
+        GRASS (1, "grass", new String[] {"./block_textures/gravel.png", "./block_textures/grass_side.png", null, null, null, "./block_textures/dirt.png"}),
+        GLASS (2, "glass", "./block_textures/glass.png"),
+        DEBUG (2047, "debug", "./block_textures/red.png"),
         ;
 
         int ID;
         String name;
-        String file;
+        private String[] file = new String[6];
 
         BlockType(int ID, String name, String file) {
+            this.ID = ID;
+            this.name = name;
+            this.file[0] = file;
+        }
+
+        BlockType(int ID, String name, String[] file) {
             this.ID = ID;
             this.name = name;
             this.file = file;
@@ -98,6 +106,24 @@ public class Block {
 
         static BlockType getRandom() {
             return getTypeFromID(new Random().nextInt(values().length));
+        }
+
+        String[] getTextureFiles() {
+            String[] textureFiles = file;
+            for(int i = 0; i < 6; i++) {
+                if(textureFiles[i] == null) {
+                    textureFiles[i] = textureFiles[i-1];
+                }
+            }
+            return textureFiles;
+        }
+
+        String getTextureFile(int side) {
+            for(int i = side; i > 0; i++) {
+                if(file[side] != null)
+                    return file[side];
+            }
+            throw new InvalidStateException("There was no texture found for block " + toString());
         }
     }
 }
