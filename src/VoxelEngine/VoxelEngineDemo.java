@@ -68,6 +68,7 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
                     cursorImg, new Point(0, 0), "blank cursor"));
 
             FPSAnimator animator = new FPSAnimator(VoxelEngineDemo.this, FPS, false);
+            animator.setUpdateFPSFrames(10, System.out);
 
             frame.addWindowListener(new WindowAdapter() {
                 @Override
@@ -154,6 +155,7 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
     }
 
     protected void drawChunk(GL2 gl, Chunk chunk, int chunkX, int chunkY) {
+        // remember, y and z are swapped in opengl
         // TODO don't iterate over blocks but rather over equally textured sides
 
         Block[][][] chunkBlocks = chunk.getEntireChunk();
@@ -161,19 +163,22 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
         float blockSize = Chunk.GRID_SIZE / 1000;  // convert to meters
         float halfBlockSize = blockSize / 2f;
 
+        gl.glPushMatrix();
+        gl.glTranslatef(
+                chunkX * Chunk.CHUNK_SIZE * blockSize,
+                0,
+                chunkY * Chunk.CHUNK_SIZE * blockSize);
+
         for(short x = 0; x < Chunk.CHUNK_SIZE; x++)
             for(short y = 0; y < Chunk.CHUNK_SIZE; y++)
                 for(short z = 0; z < Chunk.CHUNK_SIZE; z++) {
 
                     Block current = chunkBlocks[x][y][z];
                     if(current.isEmtpy() || current.isHidden()) continue;
-
-                    gl.glPushMatrix();
-
-                    gl.glTranslatef(
-                            x + chunkX * Chunk.CHUNK_SIZE * blockSize + blockSize / 2f,
-                            z                             * blockSize + blockSize / 2f,
-                            y + chunkY * Chunk.CHUNK_SIZE * blockSize + blockSize / 2f);
+                    
+                    float deltaX = x * blockSize + halfBlockSize;
+                    float deltaY = y * blockSize + halfBlockSize;
+                    float deltaZ = z * blockSize + halfBlockSize;
 
                     // draw cube
                     gl.glEnable(GL_TEXTURE_2D);
@@ -187,56 +192,56 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
 
                     // Front Face
                     if (!current.isHidden(Block.FRONT)) {
-                        gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-halfBlockSize, -halfBlockSize, halfBlockSize);
-                        gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f( halfBlockSize, -halfBlockSize, halfBlockSize);
-                        gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f( halfBlockSize, halfBlockSize, halfBlockSize);
-                        gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(-halfBlockSize, halfBlockSize, halfBlockSize);
+                        gl.glTexCoord2f(0f, 0f); gl.glVertex3f(deltaX + -halfBlockSize, deltaZ + -halfBlockSize, deltaY + halfBlockSize);
+                        gl.glTexCoord2f(1f, 0f); gl.glVertex3f(deltaX +  halfBlockSize, deltaZ + -halfBlockSize, deltaY + halfBlockSize);
+                        gl.glTexCoord2f(1f, 1f); gl.glVertex3f(deltaX +  halfBlockSize, deltaZ +  halfBlockSize, deltaY + halfBlockSize);
+                        gl.glTexCoord2f(0f, 1f); gl.glVertex3f(deltaX + -halfBlockSize, deltaZ +  halfBlockSize, deltaY + halfBlockSize);
                     }
 
                     // Back Face
                     if (!current.isHidden(Block.BACK)) {
-                        gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(-halfBlockSize, -halfBlockSize, -halfBlockSize);
-                        gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(-halfBlockSize, halfBlockSize, -halfBlockSize);
-                        gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f( halfBlockSize, halfBlockSize, -halfBlockSize);
-                        gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f( halfBlockSize, -halfBlockSize, -halfBlockSize);
+                        gl.glTexCoord2f(1f, 0f); gl.glVertex3f(deltaX + -halfBlockSize, deltaZ + -halfBlockSize, deltaY + -halfBlockSize);
+                        gl.glTexCoord2f(1f, 1f); gl.glVertex3f(deltaX + -halfBlockSize, deltaZ +  halfBlockSize, deltaY + -halfBlockSize);
+                        gl.glTexCoord2f(0f, 1f); gl.glVertex3f(deltaX +  halfBlockSize, deltaZ +  halfBlockSize, deltaY + -halfBlockSize);
+                        gl.glTexCoord2f(0f, 0f); gl.glVertex3f(deltaX +  halfBlockSize, deltaZ + -halfBlockSize, deltaY + -halfBlockSize);
                     }
 
                     // Top Face
                     if (!current.isHidden(Block.TOP)) {
-                        gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(-halfBlockSize, halfBlockSize, -halfBlockSize);
-                        gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-halfBlockSize, halfBlockSize, halfBlockSize);
-                        gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f( halfBlockSize, halfBlockSize, halfBlockSize);
-                        gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f( halfBlockSize, halfBlockSize, -halfBlockSize);
+                        gl.glTexCoord2f(0f, 1f); gl.glVertex3f(deltaX + -halfBlockSize, deltaZ +  halfBlockSize, deltaY + -halfBlockSize);
+                        gl.glTexCoord2f(0f, 0f); gl.glVertex3f(deltaX + -halfBlockSize, deltaZ +  halfBlockSize, deltaY +  halfBlockSize);
+                        gl.glTexCoord2f(1f, 0f); gl.glVertex3f(deltaX +  halfBlockSize, deltaZ +  halfBlockSize, deltaY +  halfBlockSize);
+                        gl.glTexCoord2f(1f, 1f); gl.glVertex3f(deltaX +  halfBlockSize, deltaZ +  halfBlockSize, deltaY + -halfBlockSize);
                     }
 
                     // Bottom Face
                     if (!current.isHidden(Block.BOTTOM)) {
-                        gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(-halfBlockSize, -halfBlockSize, -halfBlockSize);
-                        gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f( halfBlockSize, -halfBlockSize, -halfBlockSize);
-                        gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f( halfBlockSize, -halfBlockSize, halfBlockSize);
-                        gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(-halfBlockSize, -halfBlockSize, halfBlockSize);
+                        gl.glTexCoord2f(1f, 1f); gl.glVertex3f(deltaX + -halfBlockSize, deltaZ + -halfBlockSize, deltaY + -halfBlockSize);
+                        gl.glTexCoord2f(0f, 1f); gl.glVertex3f(deltaX +  halfBlockSize, deltaZ + -halfBlockSize, deltaY + -halfBlockSize);
+                        gl.glTexCoord2f(0f, 0f); gl.glVertex3f(deltaX +  halfBlockSize, deltaZ + -halfBlockSize, deltaY +  halfBlockSize);
+                        gl.glTexCoord2f(1f, 0f); gl.glVertex3f(deltaX + -halfBlockSize, deltaZ + -halfBlockSize, deltaY +  halfBlockSize);
                     }
 
                     // Right face
                     if (!current.isHidden(Block.RIGHT)) {
-                        gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f( halfBlockSize, -halfBlockSize, -halfBlockSize);
-                        gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f( halfBlockSize, halfBlockSize, -halfBlockSize);
-                        gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f( halfBlockSize, halfBlockSize, halfBlockSize);
-                        gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f( halfBlockSize, -halfBlockSize, halfBlockSize);
+                        gl.glTexCoord2f(1f, 0f); gl.glVertex3f(deltaX +  halfBlockSize, deltaZ + -halfBlockSize, deltaY + -halfBlockSize);
+                        gl.glTexCoord2f(1f, 1f); gl.glVertex3f(deltaX +  halfBlockSize, deltaZ +  halfBlockSize, deltaY + -halfBlockSize);
+                        gl.glTexCoord2f(0f, 1f); gl.glVertex3f(deltaX +  halfBlockSize, deltaZ +  halfBlockSize, deltaY +  halfBlockSize);
+                        gl.glTexCoord2f(0f, 0f); gl.glVertex3f(deltaX +  halfBlockSize, deltaZ + -halfBlockSize, deltaY +  halfBlockSize);
                     }
 
                     // Left Face
                     if (!current.isHidden(Block.LEFT)) {
-                        gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-halfBlockSize, -halfBlockSize, -halfBlockSize);
-                        gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(-halfBlockSize, -halfBlockSize, halfBlockSize);
-                        gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(-halfBlockSize, halfBlockSize, halfBlockSize);
-                        gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(-halfBlockSize, halfBlockSize, -halfBlockSize);
+                        gl.glTexCoord2f(0f, 0f); gl.glVertex3f(deltaX + -halfBlockSize, deltaZ + -halfBlockSize, deltaY + -halfBlockSize);
+                        gl.glTexCoord2f(1f, 0f); gl.glVertex3f(deltaX + -halfBlockSize, deltaZ + -halfBlockSize, deltaY +  halfBlockSize);
+                        gl.glTexCoord2f(1f, 1f); gl.glVertex3f(deltaX + -halfBlockSize, deltaZ +  halfBlockSize, deltaY +  halfBlockSize);
+                        gl.glTexCoord2f(0f, 1f); gl.glVertex3f(deltaX + -halfBlockSize, deltaZ +  halfBlockSize, deltaY + -halfBlockSize);
                     }
 
                     gl.glEnd();
-
-                    gl.glPopMatrix();
                 }
+
+        gl.glPopMatrix();
     }
 
     @Override
