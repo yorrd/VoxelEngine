@@ -4,8 +4,8 @@ package VoxelEngine;
 // TODO search
 public class OctreeChunk extends Chunk<OctreeChunk.OctreeNode[]> {
 
-    OctreeChunk(TerrainGenerator generator, Chunk[] neighbors) {
-        super(generator, neighbors);
+    OctreeChunk(World world, TerrainGenerator generator, Chunk[] neighbors) {
+        super(world, generator, neighbors);
     }
 
     @Override
@@ -15,6 +15,11 @@ public class OctreeChunk extends Chunk<OctreeChunk.OctreeNode[]> {
         for(int eight = 0; eight < 8; eight++) {
             chunkmap[eight] = new OctreeNode(new Block(Block.BlockType.EMPTY));
         }
+    }
+
+    @Override
+    void optimize() {
+        // TODO implement
     }
 
     @Override

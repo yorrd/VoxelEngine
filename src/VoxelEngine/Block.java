@@ -13,14 +13,14 @@ public class Block {
     public static final int FRONT = 3;
     public static final int LEFT = 4;
     public static final int BOTTOM = 5;
-    BitSet visibilityFlags = new BitSet(6);
+    BitSet isVisibleFlags = new BitSet(6);
     Block[] neighbors = new Block[6];
 
     private BlockType type = BlockType.EMPTY;
 
     public Block(BlockType material) {
         this.type = material;
-        visibilityFlags.clear();
+        isVisibleFlags.set(0, 6);
     }
 
     public BlockType getType() {
@@ -40,34 +40,26 @@ public class Block {
     }
 
     public boolean isHidden() {
-        return visibilityFlags.cardinality() == 6;
+        return isVisibleFlags.cardinality() == 0;
     }
 
-    public boolean isHidden(int side) {
-        return visibilityFlags.get(side);
+    public boolean isVisible(int side) {
+        return isVisibleFlags.get(side);
     }
 
     public void blockUpdate(int side, Block updatedBlock) {
         // updatedBlock == null means that the world has ended here and no block could be found
         // TODO do we really need both?
-        if(updatedBlock != null) {
-            visibilityFlags.set(side, !updatedBlock.isEmtpy());
-        } else {
-            visibilityFlags.set(side, true);
-        }
-        neighbors[side] = updatedBlock;
+        setNeighbor(side, updatedBlock);
     }
 
-    public int oppositeSide(int side) {
-        switch (side) {
-            case TOP: return BOTTOM;
-            case BOTTOM: return TOP;
-            case LEFT: return RIGHT;
-            case RIGHT: return LEFT;
-            case FRONT: return BACK;
-            case BACK: return FRONT;
-            default: throw new IllegalStateException("It has to be one of the sides...");
-        }
+    void setNeighbor(int side, Block neighbor) {
+        neighbors[side] = neighbor;
+        setVisible(side, neighbor != null && neighbor.isEmtpy());
+    }
+
+    void setVisible(int side, boolean visible) {
+        isVisibleFlags.set(side, visible);
     }
 
     public String toString() {

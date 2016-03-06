@@ -192,7 +192,7 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
                     // TODO some sides should be rendered but aren't. Not sure which ones
 
                     // Front Face
-                    if (!current.isHidden(Block.FRONT)) {
+                    if (current.isVisible(Block.FRONT)) {
                         gl.glTexCoord2f(0f, 0f); gl.glVertex3f(deltaX + -halfBlockSize, deltaZ + -halfBlockSize, deltaY + halfBlockSize);
                         gl.glTexCoord2f(1f, 0f); gl.glVertex3f(deltaX +  halfBlockSize, deltaZ + -halfBlockSize, deltaY + halfBlockSize);
                         gl.glTexCoord2f(1f, 1f); gl.glVertex3f(deltaX +  halfBlockSize, deltaZ +  halfBlockSize, deltaY + halfBlockSize);
@@ -200,7 +200,7 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
                     }
 
                     // Back Face
-                    if (!current.isHidden(Block.BACK)) {
+                    if (current.isVisible(Block.BACK)) {
                         gl.glTexCoord2f(1f, 0f); gl.glVertex3f(deltaX + -halfBlockSize, deltaZ + -halfBlockSize, deltaY + -halfBlockSize);
                         gl.glTexCoord2f(1f, 1f); gl.glVertex3f(deltaX + -halfBlockSize, deltaZ +  halfBlockSize, deltaY + -halfBlockSize);
                         gl.glTexCoord2f(0f, 1f); gl.glVertex3f(deltaX +  halfBlockSize, deltaZ +  halfBlockSize, deltaY + -halfBlockSize);
@@ -208,7 +208,7 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
                     }
 
                     // Top Face
-                    if (!current.isHidden(Block.TOP)) {
+                    if (current.isVisible(Block.TOP)) {
                         gl.glTexCoord2f(0f, 1f); gl.glVertex3f(deltaX + -halfBlockSize, deltaZ +  halfBlockSize, deltaY + -halfBlockSize);
                         gl.glTexCoord2f(0f, 0f); gl.glVertex3f(deltaX + -halfBlockSize, deltaZ +  halfBlockSize, deltaY +  halfBlockSize);
                         gl.glTexCoord2f(1f, 0f); gl.glVertex3f(deltaX +  halfBlockSize, deltaZ +  halfBlockSize, deltaY +  halfBlockSize);
@@ -216,7 +216,7 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
                     }
 
                     // Bottom Face
-                    if (!current.isHidden(Block.BOTTOM)) {
+                    if (current.isVisible(Block.BOTTOM)) {
                         gl.glTexCoord2f(1f, 1f); gl.glVertex3f(deltaX + -halfBlockSize, deltaZ + -halfBlockSize, deltaY + -halfBlockSize);
                         gl.glTexCoord2f(0f, 1f); gl.glVertex3f(deltaX +  halfBlockSize, deltaZ + -halfBlockSize, deltaY + -halfBlockSize);
                         gl.glTexCoord2f(0f, 0f); gl.glVertex3f(deltaX +  halfBlockSize, deltaZ + -halfBlockSize, deltaY +  halfBlockSize);
@@ -224,7 +224,7 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
                     }
 
                     // Right face
-                    if (!current.isHidden(Block.RIGHT)) {
+                    if (current.isVisible(Block.RIGHT)) {
                         gl.glTexCoord2f(1f, 0f); gl.glVertex3f(deltaX +  halfBlockSize, deltaZ + -halfBlockSize, deltaY + -halfBlockSize);
                         gl.glTexCoord2f(1f, 1f); gl.glVertex3f(deltaX +  halfBlockSize, deltaZ +  halfBlockSize, deltaY + -halfBlockSize);
                         gl.glTexCoord2f(0f, 1f); gl.glVertex3f(deltaX +  halfBlockSize, deltaZ +  halfBlockSize, deltaY +  halfBlockSize);
@@ -232,7 +232,7 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
                     }
 
                     // Left Face
-                    if (!current.isHidden(Block.LEFT)) {
+                    if (current.isVisible(Block.LEFT)) {
                         gl.glTexCoord2f(0f, 0f); gl.glVertex3f(deltaX + -halfBlockSize, deltaZ + -halfBlockSize, deltaY + -halfBlockSize);
                         gl.glTexCoord2f(1f, 0f); gl.glVertex3f(deltaX + -halfBlockSize, deltaZ + -halfBlockSize, deltaY +  halfBlockSize);
                         gl.glTexCoord2f(1f, 1f); gl.glVertex3f(deltaX + -halfBlockSize, deltaZ +  halfBlockSize, deltaY +  halfBlockSize);

@@ -19,18 +19,38 @@ public class World {
                     createNewChunk(x, y, 0);
             }
         }
+
+        // optimize
+        for(int x = -VIEW_DISTANCE; x <= VIEW_DISTANCE; x++) {
+            for (int y = -VIEW_DISTANCE; y <= VIEW_DISTANCE; y++) {
+                Chunk currentChunk = getChunk(x, y, 0);
+                if(currentChunk != null) currentChunk.optimize();
+            }
+        }
     }
 
     public void createNewChunk(int x, int y, int z) {
+        Chunk topNeighbor = getNeighbor(Block.TOP, x, y, z);
+        Chunk backNeighbor = getNeighbor(Block.BACK, x, y, z);
+        Chunk rightNeighbor = getNeighbor(Block.RIGHT, x, y, z);
+        Chunk frontNeighbor = getNeighbor(Block.FRONT, x, y, z);
+        Chunk leftNeighbor = getNeighbor(Block.LEFT, x, y, z);
+        Chunk bottomNeighbor = getNeighbor(Block.BOTTOM, x, y, z);
         Chunk[] neighbors = new Chunk[]{
-            getNeighbor(Block.TOP, x, y, z),
-            getNeighbor(Block.BACK, x, y, z),
-            getNeighbor(Block.RIGHT, x, y, z),
-            getNeighbor(Block.FRONT, x, y, z),
-            getNeighbor(Block.LEFT, x, y, z),
-            getNeighbor(Block.BOTTOM, x, y, z),
+                topNeighbor,
+                backNeighbor,
+                rightNeighbor,
+                frontNeighbor,
+                leftNeighbor,
+                bottomNeighbor,
         };
-        Chunk newChunk = new ArrayChunk(generator.getGeneratorForChunk(x, y, z), neighbors);
+        Chunk newChunk = new ArrayChunk(this, generator.getGeneratorForChunk(x, y, z), neighbors);
+        if(topNeighbor != null) topNeighbor.neighbors[Block.BOTTOM] = newChunk;
+        if(backNeighbor != null) backNeighbor.neighbors[Block.FRONT] = newChunk;
+        if(rightNeighbor != null) rightNeighbor.neighbors[Block.LEFT] = newChunk;
+        if(frontNeighbor != null) frontNeighbor.neighbors[Block.BACK] = newChunk;
+        if(leftNeighbor != null) leftNeighbor.neighbors[Block.RIGHT] = newChunk;
+        if(bottomNeighbor != null) bottomNeighbor.neighbors[Block.TOP] = newChunk;
         setChunk(x, y, z, newChunk);
     }
 
@@ -39,13 +59,7 @@ public class World {
     }
 
     Chunk getChunk(int x, int y, int z) {
-        Chunk chunk;
-        try {
-            chunk = chunksInRange[x + VIEW_DISTANCE][y + VIEW_DISTANCE];
-        } catch (Exception e) {
-            chunk = null;
-        }
-        return chunk;
+        return chunksInRange[x + VIEW_DISTANCE][y + VIEW_DISTANCE];
     }
 
     void setChunk(int x, int y, int z, Chunk chunk) {
@@ -55,9 +69,9 @@ public class World {
     Chunk getNeighbor(int side, int x, int y, int z) {
         switch (side) {
             case Block.TOP: return getChunk(x, y, z+1);
-            case Block.BACK: return getChunk(x, y+1, z);
+            case Block.BACK: return getChunk(x, y-1, z);
             case Block.RIGHT: return getChunk(x+1, y, z);
-            case Block.FRONT: return getChunk(x, y-1, z);
+            case Block.FRONT: return getChunk(x, y+1, z);
             case Block.LEFT: return getChunk(x-1, y, z);
             case Block.BOTTOM: return getChunk(x, y, z-1);
             default: throw new IllegalStateException("This direction / side does not exist");
@@ -75,5 +89,100 @@ public class World {
         int straightSteps = max - min;
 
         return Math.sqrt(2) * diagonalSteps + straightSteps;
+    }
+
+    // don't use often, expensive
+    Block globalGet(int x, int y, int z) {
+        short chunkX = (short) Math.floor(x / Chunk.CHUNK_SIZE);
+        short chunkY = (short) Math.floor(y / Chunk.CHUNK_SIZE);
+        short chunkZ = (short) Math.floor(z / Chunk.CHUNK_SIZE);
+        short blockX = (short) (x % Chunk.CHUNK_SIZE);
+        short blockY = (short) (y % Chunk.CHUNK_SIZE);
+        short blockZ = (short) (z % Chunk.CHUNK_SIZE);
+
+        Chunk c = getChunk(chunkX, chunkY, chunkZ);
+        if(c == null) return new Block(Block.BlockType.DEBUG);
+        return c.get(blockX, blockY, blockZ);
+    }
+
+    void triggerBlockUpdate(int x, int y, int z) {
+        // TODO finish adjusting when we need it
+
+//        Chunk surroundingChunk = getChunk(x % Chunk.CHUNK_SIZE, y % Chunk.CHUNK_SIZE, z % Chunk.CHUNK_SIZE);
+//        short withinX = (short) (x - x % Chunk.CHUNK_SIZE);
+//        short withinY = (short) (y - y % Chunk.CHUNK_SIZE);
+//        short withinZ = (short) (z - z % Chunk.CHUNK_SIZE);
+//
+//        Block changedBlock = surroundingChunk.get(withinX, withinY, withinZ);
+//
+//        Block top = null;
+//        if(z + 1 < CHUNK_SIZE) {
+//            top = get(x, y, ((short) (z + 1)));
+//        } else if(neighbors[Block.TOP] != null) {
+//            top = neighbors[Block.TOP].get(x, y, (short) 0);
+//        }
+//        if(top != null)
+//            top.blockUpdate(Block.BOTTOM, changedBlock);
+//        changedBlock.blockUpdate(Block.TOP, top);
+//
+//        Block front = null;
+//        if(y + 1 < CHUNK_SIZE) {
+//            front = get(x, ((short) (y + 1)), z);
+//        } else if(neighbors[Block.FRONT] != null) {
+//            front = neighbors[Block.FRONT].get(x, (short) 0, z);
+//        }
+//        if(front != null)
+//            front.blockUpdate(Block.BACK, changedBlock);
+//        changedBlock.blockUpdate(Block.FRONT, front);
+//
+//        Block right = null;
+//        if(x + 1 < CHUNK_SIZE) {
+//            right = get(((short) (x + 1)), y, z);
+//        } else if(neighbors[Block.RIGHT] != null) {
+//            right = neighbors[Block.RIGHT].get((short) 0, y, z);
+//        }
+//        if(right != null)
+//            right.blockUpdate(Block.LEFT, changedBlock);
+//        changedBlock.blockUpdate(Block.RIGHT, right);
+//
+//        Block back = null;
+//        if(y - 1 > 0) {
+//            back = get(x, ((short) (y - 1)), z);
+//        } else if(neighbors[Block.BACK] != null) {
+//            back = neighbors[Block.BACK].get(x, (short) (CHUNK_SIZE - 1), z);
+//        }
+//        if(back != null)
+//            back.blockUpdate(Block.FRONT, changedBlock);
+//        changedBlock.blockUpdate(Block.BACK, back);
+//
+//        Block left = null;
+//        if(x - 1 > 0) {
+//            left = get(((short) (x - 1)), y, z);
+//        } else if(neighbors[Block.LEFT] != null) {
+//            left = neighbors[Block.LEFT].get(((short) (CHUNK_SIZE - 1)), y, z);
+//        }
+//        if(left != null)
+//            left.blockUpdate(Block.RIGHT, changedBlock);
+//        changedBlock.blockUpdate(Block.LEFT, left);
+//
+//        Block bottom = null;
+//        if(z - 1 > 0) {
+//            bottom = get(x, y, ((short) (z - 1)));
+//        } else if(neighbors[Block.BOTTOM] != null) {
+//            bottom = neighbors[Block.BOTTOM].get(x, y, ((short) (CHUNK_SIZE - 1)));
+//        }
+//        if(bottom != null)
+//            bottom.blockUpdate(Block.TOP, changedBlock);
+//        changedBlock.blockUpdate(Block.BOTTOM, bottom);
+    }
+
+    // TODO move singleton to game object as soon as there is one
+    private static World worldInstance;
+
+    public static World getInstance() {
+        if(worldInstance == null) {
+            worldInstance = new World();
+        }
+        return worldInstance;
     }
 }

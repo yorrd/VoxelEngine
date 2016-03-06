@@ -5,8 +5,8 @@ public class IntervalTreeChunk extends Chunk<IntervalTreeChunk.IntervalTreeNode>
     static final short CHUNK_VOLUME = Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE;
     private IntervalTreeNode intervalTree;
 
-    IntervalTreeChunk(TerrainGenerator generator, Chunk[] neighbors) {
-        super(generator, neighbors);
+    IntervalTreeChunk(World world, TerrainGenerator generator, Chunk[] neighbors) {
+        super(world, generator, neighbors);
     }
 
     void initializeChunk(TerrainGenerator generator) {
@@ -18,14 +18,11 @@ public class IntervalTreeChunk extends Chunk<IntervalTreeChunk.IntervalTreeNode>
                 }
             }
         }
-        // TODO make this more efficient
-//        for (short x = 0; x < CHUNK_SIZE; x++) {
-//            for (short y = 0; y < CHUNK_SIZE; y++) {
-//                for (short z = 0; z < CHUNK_SIZE; z++) {
-//                    triggerBlockUpdate(this, x, y, z);
-//                }
-//            }
-//        }
+    }
+
+    @Override
+    void optimize() {
+        // TODO implement
     }
 
     void set(short x, short y, short z, Block block) {

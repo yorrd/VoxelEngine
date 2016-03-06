@@ -2,8 +2,8 @@ package VoxelEngine;
 
 public class ArrayChunk extends Chunk<Block[][][]> {
 
-    ArrayChunk(TerrainGenerator generator, Chunk[] neighbors) {
-        super(generator, neighbors);
+    ArrayChunk(World world, TerrainGenerator generator, Chunk[] neighbors) {
+        super(world, generator, neighbors);
     }
 
     @Override
@@ -16,12 +16,54 @@ public class ArrayChunk extends Chunk<Block[][][]> {
                 }
             }
         }
+    }
 
-        // TODO make this more efficient
+    @Override
+    void optimize() {
         for (short x = 0; x < CHUNK_SIZE; x++) {
             for (short y = 0; y < CHUNK_SIZE; y++) {
                 for (short z = 0; z < CHUNK_SIZE; z++) {
-                    triggerBlockUpdate(this, x, y, z);
+                    Block current = get(x, y, z);
+                    if(!isOnOutside(x, y, z)) {
+                        // center is easy
+                        current.setNeighbor(Block.TOP, get(x, y, (short) (z+1)));
+                        current.setNeighbor(Block.BACK, get(x, (short) (y-1), z));
+                        current.setNeighbor(Block.RIGHT, get((short) (x+1), y, z));
+                        current.setNeighbor(Block.FRONT, get(x, (short) (y+1), z));
+                        current.setNeighbor(Block.LEFT, get((short) (x-1), y, z));
+                        current.setNeighbor(Block.BOTTOM, get(x, y, (short) (z-1)));
+                    } else {
+                        // on the edges, we have to decide whether to go in the next chunk
+                        if(z+1 < CHUNK_SIZE)
+                            current.setNeighbor(Block.TOP, get(x, y, (short) (z+1)));
+                        else
+                            current.setNeighbor(Block.TOP, neighbors[Block.TOP] != null ? neighbors[Block.TOP].get(x, y, (short) 0) : null);
+
+                        if(y-1 >= 0)
+                            current.setNeighbor(Block.BACK, get(x, (short) (y-1), z));
+                        else
+                            current.setNeighbor(Block.BACK, neighbors[Block.BACK] != null ? neighbors[Block.BACK].get(x, (short) (CHUNK_SIZE-1), z) : null);
+
+                        if(x+1 < CHUNK_SIZE)
+                            current.setNeighbor(Block.RIGHT, get((short) (x+1), y, z));
+                        else
+                            current.setNeighbor(Block.RIGHT, neighbors[Block.RIGHT] != null ? neighbors[Block.RIGHT].get((short) 0, y, z) : null);
+
+                        if(y+1 < CHUNK_SIZE)
+                            current.setNeighbor(Block.FRONT, get(x, (short) (y+1), z));
+                        else
+                            current.setNeighbor(Block.FRONT, neighbors[Block.FRONT] != null ? neighbors[Block.FRONT].get(x, (short) 0, z) : null);
+
+                        if(x-1 >= 0)
+                            current.setNeighbor(Block.LEFT, get((short) (x-1), y, z));
+                        else
+                            current.setNeighbor(Block.LEFT, neighbors[Block.LEFT] != null ? neighbors[Block.LEFT].get((short) (CHUNK_SIZE-1), y, z) : null);
+
+                        if(z-1 >= 0)
+                            current.setNeighbor(Block.BOTTOM, get(x, y, (short) (z-1)));
+                        else
+                            current.setNeighbor(Block.BOTTOM, neighbors[Block.BOTTOM] != null ? neighbors[Block.BOTTOM].get(x, y, (short) (CHUNK_SIZE-1)) : null);
+                    }
                 }
             }
         }
@@ -49,6 +91,10 @@ public class ArrayChunk extends Chunk<Block[][][]> {
             }
         }
         return returnArray;
+    }
+
+    boolean isOnOutside(short x, short y, short z) {
+        return (x == 0 || y == 0 || z == 0 || x == CHUNK_SIZE - 1 || y == CHUNK_SIZE - 1 || z == CHUNK_SIZE - 1);
     }
 
     public String toString() {
