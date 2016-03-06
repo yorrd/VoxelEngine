@@ -142,20 +142,23 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
         updateCamera();
         drawDebugCoordinateSystem(gl);
 
-        Chunk[][] chunks = world.getVisibleChunks();
+        Chunk[][][] chunks = world.getVisibleChunks();
 
         for(int x = 0; x < chunks.length; x++) {
             for(int y = 0; y < chunks[0].length; y++) {
-                int chunkX = x - chunks.length / 2;
-                int chunkY = y - chunks[0].length / 2;
-                if(chunks[x][y] != null)
-                    drawChunk(gl, chunks[x][y], chunkX, chunkY);
+                for(int z = 0; z < chunks[0].length; z++) {
+                    int chunkX = x - World.VIEW_DISTANCE;
+                    int chunkY = y - World.VIEW_DISTANCE;
+                    int chunkZ = z - World.VIEW_DISTANCE;
+                    if (chunks[x][y][z] != null)
+                        drawChunk(gl, chunks[x][y][z], chunkX, chunkY, chunkZ);
+                }
             }
         }
 
     }
 
-    protected void drawChunk(GL2 gl, Chunk chunk, int chunkX, int chunkY) {
+    protected void drawChunk(GL2 gl, Chunk chunk, int chunkX, int chunkY, int chunkZ) {
         // remember, y and z are swapped in opengl
         // TODO don't iterate over blocks but rather over equally textured sides
 
@@ -167,7 +170,7 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
         gl.glPushMatrix();
         gl.glTranslatef(
                 chunkX * Chunk.CHUNK_SIZE * blockSize,
-                0,
+                chunkZ * Chunk.CHUNK_SIZE * blockSize,
                 chunkY * Chunk.CHUNK_SIZE * blockSize);
 
         for(short x = 0; x < Chunk.CHUNK_SIZE; x++)
@@ -176,7 +179,7 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
 
                     Block current = chunkBlocks[x][y][z];
                     if(current.isEmtpy() || current.isHidden()) continue;
-                    
+
                     float deltaX = x * blockSize + halfBlockSize;
                     float deltaY = y * blockSize + halfBlockSize;
                     float deltaZ = z * blockSize + halfBlockSize;
@@ -188,8 +191,6 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
                     gl.glBindTexture(GL_TEXTURE_2D, textures.get(current.getType())[0]);
                     gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
                     gl.glBegin(GL_QUADS);
-
-                    // TODO some sides should be rendered but aren't. Not sure which ones
 
                     // Front Face
                     if (current.isVisible(Block.FRONT)) {

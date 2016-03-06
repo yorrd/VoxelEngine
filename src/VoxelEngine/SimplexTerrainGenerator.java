@@ -11,8 +11,8 @@ public class SimplexTerrainGenerator extends TerrainGenerator {
         noise = new OpenSimplexNoise(seed);
     }
 
-    protected SimplexTerrainGenerator(long seed, int offset_x, int offset_y, int offset_z) {
-        super(offset_x, offset_y, offset_z);
+    protected SimplexTerrainGenerator(long seed, int offsetX, int offsetY, int offsetZ) {
+        super(offsetX, offsetY, offsetZ);
         this.seed = seed;
         noise = new OpenSimplexNoise(seed);
     }

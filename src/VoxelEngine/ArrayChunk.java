@@ -20,6 +20,7 @@ public class ArrayChunk extends Chunk<Block[][][]> {
 
     @Override
     void optimize() {
+        // optimize blocks perimeters
         for (short x = 0; x < CHUNK_SIZE; x++) {
             for (short y = 0; y < CHUNK_SIZE; y++) {
                 for (short z = 0; z < CHUNK_SIZE; z++) {
@@ -64,6 +65,18 @@ public class ArrayChunk extends Chunk<Block[][][]> {
                         else
                             current.setNeighbor(Block.BOTTOM, neighbors[Block.BOTTOM] != null ? neighbors[Block.BOTTOM].get(x, y, (short) (CHUNK_SIZE-1)) : null);
                     }
+                }
+            }
+        }
+
+        isVisibleFlags.clear();
+        // optimize chunk perimeter
+        for (short x = 0; x < CHUNK_SIZE; x++) {
+            for (short y = 0; y < CHUNK_SIZE; y++) {
+                for (short z = 0; z < CHUNK_SIZE; z++) {
+                    // primitive solution, chunk will be rendered as soon as one block on perimeter isn't COMPLETELY hidden
+                    if(isOnOutside(x, y, z) && !get(x, y, z).isHidden())
+                        isVisibleFlags.set(0, 6);
                 }
             }
         }
