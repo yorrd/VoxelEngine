@@ -4,27 +4,35 @@ public class World {
 
     public static final int VIEW_DISTANCE = 8;
 
-    Chunk[][] chunksInRange = new Chunk[VIEW_DISTANCE * 2 + 1][VIEW_DISTANCE * 2 + 1];
+    Chunk[][][] chunksInRange = new Chunk[VIEW_DISTANCE * 2 + 1][VIEW_DISTANCE * 2 + 1][VIEW_DISTANCE * 2 + 1];
     TerrainGenerator generator;
 
     World() {
         generator = new SimplexTerrainGenerator(0L);
 
-        // TODO cameraY is always 0, there are no 3d chunks yet
-
         for(int x = -VIEW_DISTANCE; x <= VIEW_DISTANCE; x++) {
             for(int y = -VIEW_DISTANCE; y <= VIEW_DISTANCE; y++) {
-                // chunks only in a circle around the center, you can't see the corners anyways
-                if(distanceOnGrid(0, 0, x, y) < VIEW_DISTANCE)
-                    createNewChunk(x, y, 0);
+                for(int z = -VIEW_DISTANCE; z <= VIEW_DISTANCE; z++) {
+                    // chunks only in a circle around the center, you can't see the corners anyways
+//                    if(z != 0) continue;
+                    if (distanceOnGrid(0, 0, x, y) < VIEW_DISTANCE)
+                        createNewChunk(x, y, z);
+                }
             }
         }
 
         // optimize
         for(int x = -VIEW_DISTANCE; x <= VIEW_DISTANCE; x++) {
             for (int y = -VIEW_DISTANCE; y <= VIEW_DISTANCE; y++) {
-                Chunk currentChunk = getChunk(x, y, 0);
-                if(currentChunk != null) currentChunk.optimize();
+                for(int z = -VIEW_DISTANCE; z <= VIEW_DISTANCE; z++) {
+                    Chunk currentChunk = getChunk(x, y, z);
+                    if (currentChunk != null) {
+                        currentChunk.optimize();
+                        // prevent from rendering
+                        if(currentChunk.isHidden())
+                            unloadChunk(x, y, z);
+                    }
+                }
             }
         }
     }
@@ -54,27 +62,35 @@ public class World {
         setChunk(x, y, z, newChunk);
     }
 
-    Chunk[][] getVisibleChunks() {
+    Chunk[][][] getVisibleChunks() {
         return chunksInRange;
     }
 
     Chunk getChunk(int x, int y, int z) {
-        return chunksInRange[x + VIEW_DISTANCE][y + VIEW_DISTANCE];
+        return chunksInRange[x + VIEW_DISTANCE][y + VIEW_DISTANCE][z + VIEW_DISTANCE];
     }
 
     void setChunk(int x, int y, int z, Chunk chunk) {
-        chunksInRange[x + VIEW_DISTANCE][y + VIEW_DISTANCE] = chunk;
+        chunksInRange[x + VIEW_DISTANCE][y + VIEW_DISTANCE][z + VIEW_DISTANCE] = chunk;
+    }
+
+    void unloadChunk(int x, int y, int z) {
+        chunksInRange[x + VIEW_DISTANCE][y + VIEW_DISTANCE][z + VIEW_DISTANCE] = null;
     }
 
     Chunk getNeighbor(int side, int x, int y, int z) {
-        switch (side) {
-            case Block.TOP: return getChunk(x, y, z+1);
-            case Block.BACK: return getChunk(x, y-1, z);
-            case Block.RIGHT: return getChunk(x+1, y, z);
-            case Block.FRONT: return getChunk(x, y+1, z);
-            case Block.LEFT: return getChunk(x-1, y, z);
-            case Block.BOTTOM: return getChunk(x, y, z-1);
-            default: throw new IllegalStateException("This direction / side does not exist");
+        try {
+            switch (side) {
+                case Block.TOP: return getChunk(x, y, z+1);
+                case Block.BACK: return getChunk(x, y-1, z);
+                case Block.RIGHT: return getChunk(x+1, y, z);
+                case Block.FRONT: return getChunk(x, y+1, z);
+                case Block.LEFT: return getChunk(x-1, y, z);
+                case Block.BOTTOM: return getChunk(x, y, z-1);
+                default: throw new IllegalStateException("This direction / side does not exist");
+            }
+        } catch (ArrayIndexOutOfBoundsException e) {
+            return null;
         }
     }
 
@@ -107,6 +123,7 @@ public class World {
 
     void triggerBlockUpdate(int x, int y, int z) {
         // TODO finish adjusting when we need it
+        // TODO if new chunk got visible
 
 //        Chunk surroundingChunk = getChunk(x % Chunk.CHUNK_SIZE, y % Chunk.CHUNK_SIZE, z % Chunk.CHUNK_SIZE);
 //        short withinX = (short) (x - x % Chunk.CHUNK_SIZE);

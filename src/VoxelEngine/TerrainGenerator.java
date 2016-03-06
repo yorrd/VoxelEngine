@@ -15,10 +15,10 @@ public abstract class TerrainGenerator {
         chunk_z = 0;
     }
 
-    protected TerrainGenerator(int chunk_x, int chunk_y, int chunk_z) {
-        this.chunk_x = chunk_x;
-        this.chunk_y = chunk_y;
-        this.chunk_z = chunk_z;
+    protected TerrainGenerator(int chunkX, int chunkY, int chunkZ) {
+        this.chunk_x = chunkX;
+        this.chunk_y = chunkY;
+        this.chunk_z = chunkZ;
         this.isInitialized = true;
     }
 

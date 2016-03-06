@@ -40,7 +40,7 @@ public class Block {
     }
 
     public boolean isHidden() {
-        return isVisibleFlags.cardinality() == 0;
+        return getType() == BlockType.EMPTY || isVisibleFlags.cardinality() == 0;
     }
 
     public boolean isVisible(int side) {

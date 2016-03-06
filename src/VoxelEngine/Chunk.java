@@ -1,5 +1,7 @@
 package VoxelEngine;
 
+import java.util.BitSet;
+
 public abstract class Chunk<T> {
 
     public static final short CHUNK_SIZE = 16;
@@ -9,9 +11,11 @@ public abstract class Chunk<T> {
     protected T chunkmap;
 
     World world;
+    BitSet isVisibleFlags = new BitSet(6);
     Chunk[] neighbors;
 
     Chunk(World world, TerrainGenerator generator, Chunk[] neighbors) {
+        isVisibleFlags.set(0, 6);
         this.world = world;
         this.neighbors = neighbors;
         initializeChunk(generator);
@@ -23,6 +27,10 @@ public abstract class Chunk<T> {
      * @param generator generator which tells us where to put what kind of block
      */
     abstract void initializeChunk(TerrainGenerator generator);
+
+    /**
+     * Optimize Blocks and Chunk visibility
+     */
     abstract void optimize();
 
     abstract void set(short x, short y, short z, Block block);
@@ -33,6 +41,10 @@ public abstract class Chunk<T> {
 
     Block[][][] getEntireChunk() {
         return getInterval((short) 0, CHUNK_SIZE, (short) 0, CHUNK_SIZE, (short) 0, CHUNK_SIZE);
+    }
+
+    boolean isHidden() {
+        return isVisibleFlags.cardinality() == 0;
     }
 
     abstract public String toString();
