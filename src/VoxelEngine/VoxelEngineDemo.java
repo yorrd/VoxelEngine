@@ -148,7 +148,8 @@ public class VoxelEngineDemo extends GLCanvas implements GLEventListener {
             for(int y = 0; y < chunks[0].length; y++) {
                 int chunkX = x - chunks.length / 2;
                 int chunkY = y - chunks[0].length / 2;
-                drawChunk(gl, chunks[x][y], chunkX, chunkY);
+                if(chunks[x][y] != null)
+                    drawChunk(gl, chunks[x][y], chunkX, chunkY);
             }
         }
 

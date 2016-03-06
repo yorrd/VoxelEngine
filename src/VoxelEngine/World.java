@@ -2,7 +2,7 @@ package VoxelEngine;
 
 public class World {
 
-    public static final int VIEW_DISTANCE = 2;
+    public static final int VIEW_DISTANCE = 8;
 
     Chunk[][] chunksInRange = new Chunk[VIEW_DISTANCE * 2 + 1][VIEW_DISTANCE * 2 + 1];
     TerrainGenerator generator;
@@ -14,7 +14,9 @@ public class World {
 
         for(int x = -VIEW_DISTANCE; x <= VIEW_DISTANCE; x++) {
             for(int y = -VIEW_DISTANCE; y <= VIEW_DISTANCE; y++) {
-                createNewChunk(x, y, 0);
+                // chunks only in a circle around the center, you can't see the corners anyways
+                if(distanceOnGrid(0, 0, x, y) < VIEW_DISTANCE)
+                    createNewChunk(x, y, 0);
             }
         }
     }
@@ -28,7 +30,7 @@ public class World {
             getNeighbor(Block.LEFT, x, y, z),
             getNeighbor(Block.BOTTOM, x, y, z),
         };
-        Chunk newChunk = new IntervalTreeChunk(generator.getGeneratorForChunk(x, y, z), neighbors);
+        Chunk newChunk = new ArrayChunk(generator.getGeneratorForChunk(x, y, z), neighbors);
         setChunk(x, y, z, newChunk);
     }
 
@@ -60,5 +62,18 @@ public class World {
             case Block.BOTTOM: return getChunk(x, y, z-1);
             default: throw new IllegalStateException("This direction / side does not exist");
         }
+    }
+
+    static double distanceOnGrid(int x1, int y1, int x2, int y2) {
+        int dx = Math.abs(x2 - x1);
+        int dy = Math.abs(y2 - y1);
+
+        int min = Math.min(dx, dy);
+        int max = Math.max(dx, dy);
+
+        int diagonalSteps = min;
+        int straightSteps = max - min;
+
+        return Math.sqrt(2) * diagonalSteps + straightSteps;
     }
 }
