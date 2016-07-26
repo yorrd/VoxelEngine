@@ -1,4 +1,4 @@
-package VoxelEngine;
+package voxelengine;
 
 import sun.plugin.dom.exception.InvalidStateException;
 
@@ -100,7 +100,7 @@ public class Block {
             return getTypeFromID(new Random().nextInt(values().length));
         }
 
-        String[] getTextureFiles() {
+        public String[] getTextureFiles() {
             String[] textureFiles = file;
             for(int i = 0; i < 6; i++) {
                 if(textureFiles[i] == null) {

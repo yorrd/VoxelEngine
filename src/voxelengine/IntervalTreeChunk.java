@@ -1,4 +1,4 @@
-package VoxelEngine;
+package voxelengine;
 
 public class IntervalTreeChunk extends Chunk<IntervalTreeChunk.IntervalTreeNode> {
 

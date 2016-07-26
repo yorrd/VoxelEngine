@@ -1,20 +1,19 @@
-package VoxelEngine;
+package voxelengine;
 
 public class World {
 
-    public static final int VIEW_DISTANCE = 8;
+    public static final int VIEW_DISTANCE = 2;
 
     Chunk[][][] chunksInRange = new Chunk[VIEW_DISTANCE * 2 + 1][VIEW_DISTANCE * 2 + 1][VIEW_DISTANCE * 2 + 1];
     TerrainGenerator generator;
 
-    World() {
+    public World() {
         generator = new SimplexTerrainGenerator(0L);
 
         for(int x = -VIEW_DISTANCE; x <= VIEW_DISTANCE; x++) {
             for(int y = -VIEW_DISTANCE; y <= VIEW_DISTANCE; y++) {
                 for(int z = -VIEW_DISTANCE; z <= VIEW_DISTANCE; z++) {
                     // chunks only in a circle around the center, you can't see the corners anyways
-//                    if(z != 0) continue;
                     if (distanceOnGrid(0, 0, x, y) < VIEW_DISTANCE)
                         createNewChunk(x, y, z);
                 }
@@ -62,7 +61,7 @@ public class World {
         setChunk(x, y, z, newChunk);
     }
 
-    Chunk[][][] getVisibleChunks() {
+    public Chunk[][][] getVisibleChunks() {
         return chunksInRange;
     }
 

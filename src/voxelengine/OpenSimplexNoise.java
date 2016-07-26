@@ -1,4 +1,4 @@
-package VoxelEngine;
+package voxelengine;
 
 /*
  * OpenSimplex Noise in Java.

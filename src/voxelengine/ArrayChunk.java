@@ -1,6 +1,6 @@
-package VoxelEngine;
+package voxelengine;
 
-public class ArrayChunk extends Chunk<Block[][][]> {
+class ArrayChunk extends Chunk<Block[][][]> {
 
     ArrayChunk(World world, TerrainGenerator generator, Chunk[] neighbors) {
         super(world, generator, neighbors);
@@ -106,7 +106,7 @@ public class ArrayChunk extends Chunk<Block[][][]> {
         return returnArray;
     }
 
-    boolean isOnOutside(short x, short y, short z) {
+    private boolean isOnOutside(short x, short y, short z) {
         return (x == 0 || y == 0 || z == 0 || x == CHUNK_SIZE - 1 || y == CHUNK_SIZE - 1 || z == CHUNK_SIZE - 1);
     }
 

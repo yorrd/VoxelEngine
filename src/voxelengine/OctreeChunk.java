@@ -1,4 +1,4 @@
-package VoxelEngine;
+package voxelengine;
 
 // TODO T = OctreeNode, not array
 // TODO search

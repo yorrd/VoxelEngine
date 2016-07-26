@@ -1,4 +1,4 @@
-package VoxelEngine;
+package voxelengine;
 
 public class SimplexTerrainGenerator extends TerrainGenerator {
 
@@ -19,9 +19,9 @@ public class SimplexTerrainGenerator extends TerrainGenerator {
 
     @Override
     protected Block createBlock(int x, int y, int z) {
-        x += chunk_x;
-        y += chunk_y;
-        z += chunk_z;
+        x += chunkX;
+        y += chunkY;
+        z += chunkZ;
 
         int min = 4;
         int max = 10;

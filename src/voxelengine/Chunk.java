@@ -1,4 +1,4 @@
-package VoxelEngine;
+package voxelengine;
 
 import java.util.BitSet;
 
@@ -39,7 +39,7 @@ public abstract class Chunk<T> {
 
     abstract Block[][][] getInterval(short x1, short x2, short y1, short y2, short z1, short z2);
 
-    Block[][][] getEntireChunk() {
+    public Block[][][] getEntireChunk() {
         return getInterval((short) 0, CHUNK_SIZE, (short) 0, CHUNK_SIZE, (short) 0, CHUNK_SIZE);
     }
 

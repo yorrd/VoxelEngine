@@ -1,4 +1,4 @@
-package VoxelEngine;
+package voxelengine;
 
 
 public class EmptyWorldGenerator extends TerrainGenerator {

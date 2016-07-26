@@ -1,24 +1,24 @@
-package VoxelEngine;
+package voxelengine;
 
 import sun.plugin.dom.exception.InvalidStateException;
 
 public abstract class TerrainGenerator {
 
-    protected final int chunk_x;
-    protected final int chunk_y;
-    protected final int chunk_z;
-    protected boolean isInitialized = false;
+    final int chunkX;
+    final int chunkY;
+    final int chunkZ;
+    boolean isInitialized = false;
 
     TerrainGenerator() {
-        chunk_x = 0;
-        chunk_y = 0;
-        chunk_z = 0;
+        chunkX = 0;
+        chunkY = 0;
+        chunkZ = 0;
     }
 
     protected TerrainGenerator(int chunkX, int chunkY, int chunkZ) {
-        this.chunk_x = chunkX;
-        this.chunk_y = chunkY;
-        this.chunk_z = chunkZ;
+        this.chunkX = chunkX;
+        this.chunkY = chunkY;
+        this.chunkZ = chunkZ;
         this.isInitialized = true;
     }
 

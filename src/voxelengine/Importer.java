@@ -1,4 +1,4 @@
-package VoxelEngine;
+package voxelengine;
 
 //import org.jnbt.NBTInputStream;
 //import org.jnbt.Tag;
